@@ -1,0 +1,59 @@
+.config-card {
+  border: 0;
+  border-radius: 1rem;
+  background-color: white;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.input-group-text-icon {
+  background-color: #f8f9fa;
+  border-right: 0;
+}
+
+.form-control-custom {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.form-control-pin {
+  border-left: 0;
+  border-right: 0;
+  padding-left: 0;
+}
+
+.btn-eye {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-left: 0;
+  color: #6c757d;
+}
+
+.trade-mode-select {
+  border-left: 0;
+  padding-left: 0;
+  font-weight: bold;
+  color: #212529;
+}
+
+.option-box {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  transition: all 0.2s;
+}
+
+.option-box.active {
+  background-color: rgba(13, 110, 253, 0.1);
+  border-color: #0d6efd;
+  color: #212529;
+}
+
+.btn-save {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}

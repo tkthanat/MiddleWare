@@ -1,0 +1,13 @@
+# --- Backend ---
+__pycache__/
+*.py[cod]
+venv/
+.env
+settings.json
+trade_logs.json
+
+# --- Frontend ---
+node_modules/
+dist/
+.DS_Store
+.vscode/
