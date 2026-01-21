@@ -1,5 +1,212 @@
 [
     {
+        "timestamp": "2026-01-21 15:45:17",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33.5,
+        "detail": "Order No : 5XG2Z6OR21 | Status : Matched(M)",
+        "status": "SUCCESS"
+    },
+    {
+        "timestamp": "2026-01-21 15:43:47",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:42:46",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:42:41",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:42:36",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:42:29",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:41:51",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:41:45",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:41:38",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:41:28",
+        "symbol": "UNKNOWN_STOCK",
+        "action": "Buy",
+        "volume": 50,
+        "price": 100,
+        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 15:38:26",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 2900,
+        "price": 33.5,
+        "detail": "Order No : 5XG2SDWEGH | Status : Matched(M)",
+        "status": "SUCCESS"
+    },
+    {
+        "timestamp": "2026-01-21 15:36:58",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 33.5,
+        "status": "SKIPPED",
+        "detail": "Calculated volume is 0 (Budget too low)"
+    },
+    {
+        "timestamp": "2026-01-21 15:28:11",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 33.5,
+        "status": "SKIPPED",
+        "detail": "Calculated volume is 0 (Budget too low)"
+    },
+    {
+        "timestamp": "2026-01-21 14:37:43",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 200,
+        "price": 33.5,
+        "detail": "Order No : 5XG1457DLL | Status : Matched(M)",
+        "status": "SUCCESS"
+    },
+    {
+        "timestamp": "2026-01-21 13:17:43",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.25,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 13:17:04",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.25,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 13:15:01",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.25,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 13:12:11",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.25,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 13:09:20",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.25,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 13:05:51",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.25,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 13:03:29",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.25,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 10:14:51",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Cancelled(R) | Reason : Cancelled by system",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-21 10:01:13",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Order No : 5XFTHTVE9T | Status : Pending(S)",
+        "status": "SUCCESS"
+    },
+    {
         "timestamp": "2026-01-20 14:48:33",
         "symbol": "PTT",
         "action": "Buy",

@@ -1,8 +1,9 @@
 {
     "account_no": "test0001-E",
     "pin": "000000",
-    "trade_mode": "VOLUME",
-    "budget_per_trade": 10000.0,
+    "trade_mode": "AMOUNT",
+    "budget_per_trade": 5000.0,
     "fixed_volume": 100,
-    "discord_webhook_url": "https://discord.com/api/webhooks/1463009032666087643/dJPE8O_AXfMiuZHahCG98y1lO4i9s_z-BvTWL1goFCQIxeS_GdVV88RVVpW3LBkMZPcC"
+    "telegram_bot_token": "8339859004:AAGF27IlemJck-gcExJuQM6by7x_zySukF0",
+    "telegram_chat_id": "-5241207398"
 }
