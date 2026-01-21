@@ -4,7 +4,7 @@ import traceback
 import os
 import requests
 import time
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
 from settrade_v2 import Investor
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,15 +32,8 @@ class SettingsModel(BaseModel):
     trade_mode: str
     budget_per_trade: float
     fixed_volume: int
-
-# User Settings
-USER_SETTINGS = {
-    "account_no": "test0001-E",
-    "pin": "000000",
-    "trade_mode": "AMOUNT",
-    "trade_value": 5000,
-    "is_simulation": True
-}
+    telegram_bot_token: str = ""
+    telegram_chat_id: str = ""
 
 # เชื่อมต่อ Settrade Open API
 investor = Investor(
@@ -51,16 +44,22 @@ investor = Investor(
     is_auto_queue=False
 )
 
-equity = investor.Equity(account_no=USER_SETTINGS["account_no"])
-market = investor.MarketData()
+# User Settings
+USER_SETTINGS = {
+    "account_no": "test0001-E",
+    "pin": "000000",
+    "trade_mode": "AMOUNT",
+    "trade_value": 5000,
+    "is_simulation": True
+}
 
-class SettingsModel(BaseModel):
-    account_no: str
-    pin: str
-    trade_mode: str
-    budget_per_trade: float
-    fixed_volume: int
-    discord_webhook_url: str = ""
+# Init Instances
+try:
+    equity = investor.Equity(account_no=USER_SETTINGS["account_no"])
+    market = investor.MarketData()
+except Exception as e:
+    print(f"Init Error (Expected if settings not loaded): {e}")
+
 
 # --- ฟังก์ชันสำหรับอ่านค่า Setting จากไฟล์ ---
 def load_user_settings():
@@ -73,35 +72,64 @@ def load_user_settings():
             "pin": "000000",
             "trade_mode": "AMOUNT",
             "budget_per_trade": 5000,
-            "fixed_volume": 100
+            "fixed_volume": 100,
+            "telegram_bot_token": "",
+            "telegram_chat_id": ""
         }
     
-# MODULAR NOTIFICATION SYSTEM (Switchable)
-def send_notification(message: str):
-    settings = load_user_settings()
-    
-    # ดึงค่า Config ของ Discord
-    discord_url = settings.get("discord_webhook_url", "")
-
-    if discord_url:
-        send_discord_webhook(discord_url, message)
-    else:
-        print("No Discord Webhook found. Skipping notification.")
-
-# --- Discord Module ---
-def send_discord_webhook(webhook_url, text):
-    data = {
-        "content": text,
-        "username": "MiddleWare Bot"
-    }
+# --- Telegram Notification System ---
+def send_telegram_message(message: str):
     try:
-        response = requests.post(webhook_url, json=data)
-        if response.status_code == 204:
-            print("Discord Message Sent")
+        settings = load_user_settings()
+        bot_token = settings.get("telegram_bot_token", "")
+        chat_id = settings.get("telegram_chat_id", "")
+
+        if not bot_token or not chat_id:
+            print("Telegram Config is missing.")
+            return
+
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        
+        payload = {
+            "chat_id": chat_id,
+            "text": message,
+            "parse_mode": "Markdown" 
+        }
+        
+        response = requests.post(url, json=payload)
+        
+        if response.status_code != 200:
+            print(f"Telegram Error: {response.text}")
         else:
-            print(f"Discord Error: {response.text}")
+            print("Telegram Message Sent")
+            
     except Exception as e:
-        print(f"Error sending Discord: {e}")
+        print(f"Error sending Telegram: {e}")
+
+# Wrapper Function
+def send_notification(message: str):
+    send_telegram_message(message)
+
+# --- ANTI-SPAM SYSTEM ---
+last_error_logs = {}
+ERROR_COOLDOWN = 60
+
+def send_notification_smart(message: str, type="INFO"):
+
+    global last_error_logs
+    
+    if type == "ERROR":
+        current_time = time.time()
+        
+        if message in last_error_logs:
+            if current_time - last_error_logs[message] < ERROR_COOLDOWN:
+                print(f"🔇 Anti-Spam: Skip sending duplicate error.")
+                return
+        
+        last_error_logs[message] = current_time
+
+    send_notification(message)
+
     
 # --- ฟังก์ชันจัดการ Logs ---
 TRADE_LOG_FILE = "trade_logs.json"
@@ -132,37 +160,13 @@ def get_trade_logs():
         except:
             return []
     return []
-    
-# --- ฟังก์ชันบันทึก Log ลงไฟล์ JSON ---
-def save_trade_log(log_entry):
-    file_name = "trade_logs.json"
-    logs = []
-
-    # ถ้ามีไฟล์อยู่แล้ว ให้อ่านข้อมูลเก่าออกมาก่อน
-    if os.path.exists(file_name):
-        try:
-            with open(file_name, "r", encoding="utf-8") as f:
-                logs = json.load(f)
-        except:
-            logs = []
-
-    # เพิ่มข้อมูลใหม่เข้าไปข้างหน้าสุด
-    logs.insert(0, log_entry)
-
-    # บันทึกกลับลงไฟล์
-    with open(file_name, "w", encoding="utf-8") as f:
-        json.dump(logs, f, indent=4, ensure_ascii=False)
 
 # --- API Frontend ---
-
-# API ดึงข้อมูลการตั้งค่าปัจจุบัน
 
 @app.get("/api/settings")
 async def get_settings():
     current_settings = load_user_settings()
     return current_settings
-
-# API บันทึกการตั้งค่าใหม่
 
 @app.post("/api/settings")
 async def save_settings(settings: SettingsModel):
@@ -174,30 +178,33 @@ async def save_settings(settings: SettingsModel):
         with open("settings.json", "w") as f:
             json.dump(new_settings_dict, f, indent=4)
             
-        print(" Settings Updated via React API!")
+        print("Settings Updated via React API!")
         return {"status": "success", "message": "Settings saved successfully"}
     except Exception as e:
-        print(f" Error saving settings: {e}")
+        print(f"Error saving settings: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-# API ดึงประวัติการเทรด
 
 @app.get("/api/logs")
 async def read_logs():
     return get_trade_logs()
 
-# API Endpoint
+# --- API Endpoint ---
 
 @app.post("/webhook")
-async def tradingview_webhook(request: Request):
+async def tradingview_webhook(request: Request, background_tasks: BackgroundTasks):
     try:
         data = await request.json()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] Received Signal: {data}")
 
-        # โหลดการตั้งค่าล่าสุดจากไฟล์ (เพื่อให้ค่าไม่อัปเดตตามไฟล์ json)
         current_settings = load_user_settings()
         
+        # Re-init Equity with dynamic account
+        try:
+            equity = investor.Equity(account_no=current_settings["account_no"])
+        except:
+            pass
+
         print(f"Using Config: Mode={current_settings['trade_mode']}, Budget={current_settings.get('budget_per_trade', 0)}")
 
         if 'symbol' not in data or 'action' not in data:
@@ -205,12 +212,10 @@ async def tradingview_webhook(request: Request):
 
         symbol = data['symbol']
         action = data['action'].capitalize()
-
         last_price = data.get('price', 0) 
 
-        # PROCESS
+        # PROCESS VOLUME
         volume = 0
-        
         if current_settings["trade_mode"] == "VOLUME":
             volume = current_settings["fixed_volume"]
         
@@ -218,7 +223,6 @@ async def tradingview_webhook(request: Request):
             try:
                 market_data = market.get_quote_symbol(symbol)
                 market_price = market_data.get('last')
-
                 if market_price and market_price > 0:
                     last_price = market_price
                 else:
@@ -229,7 +233,6 @@ async def tradingview_webhook(request: Request):
             if last_price > 0:
                 budget = current_settings["budget_per_trade"]
                 raw_volume = int(budget // last_price)
-                
                 if raw_volume >= 100:
                     volume = (raw_volume // 100) * 100
                 else:
@@ -241,7 +244,6 @@ async def tradingview_webhook(request: Request):
         if volume > 0:
             print(f"Executing Order: {action} {symbol} -> {volume} Shares")
             
-            # เตรียมข้อมูล Log เบื้องต้น
             log_data = {
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "symbol": symbol,
@@ -252,66 +254,79 @@ async def tradingview_webhook(request: Request):
             }
 
             try:
-                place_order_result = equity.place_order(
-                    symbol=symbol,
-                    price_type="MP-MKT",
-                    side=action,
-                    volume=volume,
-                    price=0,
-                    pin=current_settings["pin"],
-                    validity_type="IOC"
-                )
+                # --- AUTO-RETRY LOGIC ---
+                MAX_RETRIES = 3
+                place_order_result = None
+                last_exception = None
+
+                for attempt in range(MAX_RETRIES):
+                    try:
+                        print(f"Attempt {attempt+1}/{MAX_RETRIES}: Sending Order...")
+                        place_order_result = equity.place_order(
+                            symbol=symbol,
+                            price_type="MP-MKT",
+                            side=action,
+                            volume=volume,
+                            price=0,
+                            pin=current_settings["pin"],
+                            validity_type="IOC"
+                        )
+                        break 
+                    except Exception as e:
+                        print(f"⚠️ Attempt {attempt+1} Failed: {e}")
+                        last_exception = e
+                        if attempt < MAX_RETRIES - 1:
+                            time.sleep(1)
+                        else:
+                            raise last_exception
                 
-                # ดึงเลข Order No มาเพื่อติดตามผล
                 order_no = place_order_result.get('orderNo')
 
-                time.sleep(1.0) 
+                time.sleep(5.0)
 
-                # ดึงข้อมูล Order ล่าสุดจาก Settrade
                 actual_order_info = equity.get_order(order_no)
                 order_status = actual_order_info.get('showOrderStatus', 'Pending')
                 reject_reason = actual_order_info.get('rejectReason', '-')
 
-                # ถ้าเจอคำว่า Cancelled, Rejected หรือ Failed ให้ถือว่าเป็น ERROR
                 if 'Cancelled' in order_status or 'Rejected' in order_status or 'Failed' in order_status:
-                    
-                    # --- กรณีโดน Reject/Cancel ---
+                    # --- REJECTED ---
                     log_data["status"] = "ERROR"
                     log_data["detail"] = f"Status : {order_status} | Reason : {reject_reason}"
                     save_trade_log(log_data)
 
-                    msg = f"Order Rejected!\nSymbol : {symbol}\nSide : {action}\nStatus : {order_status}\nReason : {reject_reason} \n"
-                    send_notification(msg)
+                    msg = f"❌ *Order Rejected!* \n Symbol: `{symbol}` \n Side : {action} \n Status : {order_status} \n Reason : {reject_reason}"
+                    background_tasks.add_task(send_notification_smart, msg, "ERROR")
 
                     print(f"Order Rejected: {order_status} - {reject_reason}")
                     return {"status": "rejected", "data": actual_order_info}
 
                 else:
-                    # --- กรณีสำเร็จ (Matched, Queuing, Pending) ---
+                    # --- SUCCESS ---
                     log_data["status"] = "SUCCESS"
                     log_data["detail"] = f"Order No : {order_no} | Status : {order_status}"
                     save_trade_log(log_data)
 
-                    msg = f"Order Executed!\nSymbol : {symbol}\nSide : {action}\nVol : {volume}\nPrice : {last_price}\nStatus : {order_status} \n"
-                    send_notification(msg)
+                    msg = f"✅ *Order Executed!* \n Symbol : `{symbol}`\n Side : {action} \n Vol : {volume} \n Price : {last_price} \n Status : {order_status}"
+                    background_tasks.add_task(send_notification_smart, msg, "INFO")
 
                     print(f"Order Success : {order_status}")
                     return {"status": "success", "data": place_order_result}
 
             except Exception as e:
-                # Error Log
+                # --- ERROR ---
                 log_data["status"] = "ERROR"
                 log_data["detail"] = str(e)
                 save_trade_log(log_data)
 
-                msg = f"Order Failed!\nSymbol : {symbol}\nSide : {action}\nError : {str(e)} \n"
-                send_notification(msg)
+                msg = f"⚠️ *Order Failed!* \n Symbol : `{symbol}` \n Side : {action} \n Error : {str(e)}"
+                background_tasks.add_task(send_notification_smart, msg, "ERROR")
 
                 print(f"Order Failed : {str(e)}")
-                raise HTTPException(status_code=500, detail=str(e))
+
+                return {"status": "error", "message": str(e)} 
 
         else:
-            # Skipped Log
+            # --- SKIPPED ---
             log_data = {
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "symbol": symbol,
@@ -323,6 +338,9 @@ async def tradingview_webhook(request: Request):
             }
             save_trade_log(log_data)
             
+            msg = f"⚠️ *Order Skipped!* \n Symbol : `{symbol}` \n Action : {action} \n Reason : Volume is 0 (Budget {current_settings.get('budget_per_trade')} too low for price {last_price})"
+            background_tasks.add_task(send_notification_smart, msg, "INFO")
+
             print("Volume is 0, no order sent.")
             return {"status": "skipped", "message": "Volume calculated is 0"}
 
