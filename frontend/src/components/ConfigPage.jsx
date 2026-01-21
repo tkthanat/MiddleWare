@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { FaEye, FaEyeSlash, FaWallet, FaLock, FaChartLine, FaCoins, FaSave, FaDiscord } from 'react-icons/fa'
+import { FaEye, FaEyeSlash, FaWallet, FaLock, FaChartLine, FaCoins, FaSave, FaDiscord, FaPaperPlane, FaRobot, FaHashtag } from 'react-icons/fa'
 import { MdSettingsInputComponent } from 'react-icons/md'
 
 import '../css/ConfigPage.css' 
@@ -12,7 +12,8 @@ function ConfigPage() {
     trade_mode: 'AMOUNT',
     budget_per_trade: 0,
     fixed_volume: 0,
-    discord_webhook_url: ''
+    telegram_bot_token: '',
+    telegram_chat_id: ''
   })
   const [status, setStatus] = useState(null)
   const [showPin, setShowPin] = useState(false)
@@ -99,24 +100,45 @@ function ConfigPage() {
                 </div>
 
                 <h6 className="text-primary fw-bold mb-3 mt-4 text-uppercase border-bottom pb-2">
-                  <FaDiscord className="me-2"/> Notification System
+                  <FaPaperPlane className="me-2"/> Notification System
                 </h6>
 
-                <div className="mb-4">
-                  <label className="form-label text-muted fw-bold">Discord Webhook URL</label>
+                {/* Bot Token */}
+                <div className="mb-3">
+                  <label className="form-label text-muted fw-bold">Telegram Bot Token</label>
                   <div className="input-group">
-                    <span className="input-group-text bg-primary text-white border-end-0">
-                      <FaDiscord />
+                    <span className="input-group-text bg-light border-end-0 text-primary">
+                      <FaRobot />
                     </span>
                     <input 
                         type="text" 
                         className="form-control form-control-custom" 
-                        name="discord_webhook_url" 
-                        value={formData.discord_webhook_url || ''} 
+                        name="telegram_bot_token" 
+                        value={formData.telegram_bot_token || ''} 
                         onChange={handleChange} 
-                        placeholder="https://discord.com/api/webhooks/..." 
+                        placeholder="e.g. 123456789:ABCdefGHI..." 
                     />
                   </div>
+                  <div className="form-text small">Get from @BotFather</div>
+                </div>
+
+                {/* Chat ID */}
+                <div className="mb-4">
+                  <label className="form-label text-muted fw-bold">Chat ID</label>
+                  <div className="input-group">
+                    <span className="input-group-text bg-light border-end-0 text-primary">
+                      <FaHashtag />
+                    </span>
+                    <input 
+                        type="text" 
+                        className="form-control form-control-custom" 
+                        name="telegram_chat_id" 
+                        value={formData.telegram_chat_id || ''} 
+                        onChange={handleChange} 
+                        placeholder="e.g. -100123456789" 
+                    />
+                  </div>
+                  <div className="form-text small">Group ID where the bot is invited</div>
                 </div>
 
                 {/* Trading Strategy */}
