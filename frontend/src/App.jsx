@@ -1,32 +1,38 @@
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
-import ConfigPage from './components/ConfigPage'
-import LogsPage from './components/LogsPage'
+import ConfigPage from './pages/ConfigPage'
+import LogsPage from './pages/LogsPage'
 import { FaCog, FaList } from 'react-icons/fa'
+import './App.css'
 
 function Navigation() {
   const location = useLocation()
+  
   return (
-    <nav 
-      className="navbar navbar-expand navbar-light bg-white shadow-sm py-3 mb-4"
-      style={{ position: 'sticky', top: 0, zIndex: 1000 }} 
-    >
-      <div className="container justify-content-center">
-        <div className="btn-group shadow-sm">
-          <Link to="/" className={`btn btn-lg px-4 ${location.pathname === '/' ? 'btn-primary' : 'btn-outline-primary'}`}>
-            <FaCog className="me-2"/> Settings
-          </Link>
-          <Link to="/logs" className={`btn btn-lg px-4 ${location.pathname === '/logs' ? 'btn-primary' : 'btn-outline-primary'}`}>
-            <FaList className="me-2"/> Logs
-          </Link>
-        </div>
+    <div className="d-flex justify-content-center pt-4 pb-3">
+      <div className="nav-pill-float bg-white shadow-sm rounded-pill p-1 d-flex align-items-center">
+        <Link 
+          to="/" 
+          className={`nav-item px-4 py-2 rounded-pill d-flex align-items-center fw-bold text-decoration-none ${location.pathname === '/' ? 'active' : 'text-muted'}`}
+        >
+          <FaCog className="me-2"/> Config
+        </Link>
+        
+        <div className="vr my-2 mx-1 text-muted opacity-25"></div>
+
+        <Link 
+          to="/logs" 
+          className={`nav-item px-4 py-2 rounded-pill d-flex align-items-center fw-bold text-decoration-none ${location.pathname === '/logs' ? 'active' : 'text-muted'}`}
+        >
+          <FaList className="me-2"/> Logs
+        </Link>
       </div>
-    </nav>
+    </div>
   )
 }
 
 function App() {
   return (
-    <div className="min-vh-100 w-100 bg-light text-dark">
+    <div className="bg-dashboard min-vh-100 font-inter">
       <BrowserRouter>
         <Navigation />
         <Routes>
