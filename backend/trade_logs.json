@@ -1,416 +1,506 @@
 [
     {
-        "timestamp": "2026-01-21 15:45:17",
+        "timestamp": "2026-01-28 14:52:24",
+        "symbol": "CBG",
+        "action": "GUARD",
+        "volume": 0,
+        "price": 0,
+        "status": "STOPPED",
+        "detail": "⛔ [TEST MODE] Simulated Max Loss Triggered (-99,999 THB)"
+    },
+    {
+        "timestamp": "2026-01-28 12:39:03",
         "symbol": "PTT",
         "action": "Buy",
         "volume": 100,
-        "price": 33.5,
-        "detail": "Order No : 5XG2Z6OR21 | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-21 15:43:47",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "price": 33.25,
+        "detail": "Network/API Error: Cannot place Market or Market to Limit order when market is not open",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 15:42:46",
-        "symbol": "UNKNOWN_STOCK",
+        "timestamp": "2026-01-28 12:35:52",
+        "symbol": "CBG",
         "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
+        "volume": 100,
+        "price": 45.5,
+        "detail": "Network/API Error: Cannot place Market or Market to Limit order when market is not open",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 15:42:41",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-21 15:42:36",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-21 15:42:29",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-21 15:41:51",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-21 15:41:45",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-21 15:41:38",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-21 15:41:28",
-        "symbol": "UNKNOWN_STOCK",
-        "action": "Buy",
-        "volume": 50,
-        "price": 100,
-        "detail": "Stock [UNKNOWN_STOCK] is not found",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-21 15:38:26",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 2900,
-        "price": 33.5,
-        "detail": "Order No : 5XG2SDWEGH | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-21 15:36:58",
+        "timestamp": "2026-01-28 07:09:14",
         "symbol": "PTT",
         "action": "Buy",
         "volume": 0,
-        "price": 33.5,
+        "price": 60,
         "status": "SKIPPED",
-        "detail": "Calculated volume is 0 (Budget too low)"
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
     },
     {
-        "timestamp": "2026-01-21 15:28:11",
+        "timestamp": "2026-01-28 07:09:04",
         "symbol": "PTT",
         "action": "Buy",
         "volume": 0,
-        "price": 33.5,
+        "price": 60,
         "status": "SKIPPED",
-        "detail": "Calculated volume is 0 (Budget too low)"
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
     },
     {
-        "timestamp": "2026-01-21 14:37:43",
+        "timestamp": "2026-01-28 07:08:41",
         "symbol": "PTT",
         "action": "Buy",
+        "volume": 0,
+        "price": 60,
+        "status": "SKIPPED",
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
+    },
+    {
+        "timestamp": "2026-01-28 07:05:35",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 60,
+        "detail": "Network/API Error: Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 15:18:45",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 15:17:30",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 15:12:40",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 15:10:52",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 15:08:27",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 15:07:38",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 14:59:43",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 14:59:12",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Network/API Error: Invalid Pin Number",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 14:09:47",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 12:32:17",
+        "symbol": "PTT",
+        "action": "GUARD",
+        "volume": 0,
+        "price": 0,
+        "status": "STOPPED",
+        "detail": "⛔ FORCE TEST: MAX LOSS TRIGGERED (Code is working!)"
+    },
+    {
+        "timestamp": "2026-01-27 12:27:58",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 12:18:32",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 10:41:59",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-27 10:40:54",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 15:13:37",
+        "symbol": "CBG",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 15:12:44",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 15:11:19",
+        "symbol": "CBG",
+        "action": "Buy",
         "volume": 200,
+        "price": 44.5,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 15:09:02",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.0,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 15:00:26",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.0,
+        "detail": "Network/API Error: Simulated Connection Timeout",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 13:23:35",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.0,
+        "detail": "Network/API Error: Simulated Connection Timeout",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 13:21:57",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.0,
+        "detail": "Network/API Error: Simulated Connection Timeout",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 12:48:01",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.0,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 12:37:49",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 300,
+        "price": 33.0,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 12:36:47",
+        "symbol": "AOT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 0,
+        "status": "SKIPPED",
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
+    },
+    {
+        "timestamp": "2026-01-26 12:35:00",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33.0,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 12:29:39",
+        "symbol": "AOT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 12:29:21",
+        "symbol": "AOT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 33,
+        "status": "SKIPPED",
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
+    },
+    {
+        "timestamp": "2026-01-26 12:29:05",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 33.0,
+        "status": "SKIPPED",
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
+    },
+    {
+        "timestamp": "2026-01-26 12:24:03",
+        "symbol": "AOT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 12:20:19",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33.0,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 10:26:03",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33.0,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 09:37:00",
+        "symbol": "AOT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 09:36:20",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 07:58:50",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 07:58:39",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 60,
+        "status": "SKIPPED",
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
+    },
+    {
+        "timestamp": "2026-01-26 07:58:08",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 60,
+        "status": "SKIPPED",
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
+    },
+    {
+        "timestamp": "2026-01-26 07:56:35",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 33,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-26 07:56:12",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 0,
+        "price": 0,
+        "status": "SKIPPED",
+        "detail": "Min Guard: Vol 0 < 100 (Odd Lot)"
+    },
+    {
+        "timestamp": "2026-01-25 14:51:33",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
+        "price": 38.75,
+        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "status": "ERROR"
+    },
+    {
+        "timestamp": "2026-01-23 15:41:24",
+        "symbol": "PTT",
+        "action": "Buy",
+        "volume": 100,
         "price": 33.5,
-        "detail": "Order No : 5XG1457DLL | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-21 13:17:43",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 300,
-        "price": 33.25,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 13:17:04",
+        "timestamp": "2026-01-23 15:39:31",
         "symbol": "PTT",
         "action": "Buy",
-        "volume": 300,
-        "price": 33.25,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "volume": 100,
+        "price": 33.5,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 13:15:01",
+        "timestamp": "2026-01-23 15:19:32",
         "symbol": "PTT",
         "action": "Buy",
-        "volume": 300,
-        "price": 33.25,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "volume": 100,
+        "price": 34,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 13:12:11",
+        "timestamp": "2026-01-23 15:15:00",
         "symbol": "PTT",
         "action": "Buy",
-        "volume": 300,
-        "price": 33.25,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "volume": 100,
+        "price": 34,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 13:09:20",
+        "timestamp": "2026-01-23 15:12:55",
         "symbol": "PTT",
         "action": "Buy",
-        "volume": 300,
-        "price": 33.25,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "volume": 100,
+        "price": 34,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 13:05:51",
+        "timestamp": "2026-01-23 15:10:27",
         "symbol": "PTT",
         "action": "Buy",
-        "volume": 300,
-        "price": 33.25,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "volume": 100,
+        "price": 34,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 13:03:29",
-        "symbol": "PTT",
+        "timestamp": "2026-01-23 15:06:48",
+        "symbol": "WHA",
         "action": "Buy",
-        "volume": 300,
-        "price": 33.25,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "volume": 100,
+        "price": 33,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 10:14:51",
+        "timestamp": "2026-01-23 15:05:37",
         "symbol": "PTT",
         "action": "Buy",
         "volume": 100,
-        "price": 33,
-        "detail": "Status : Cancelled(R) | Reason : Cancelled by system",
+        "price": 33.75,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-21 10:01:13",
+        "timestamp": "2026-01-23 15:04:48",
         "symbol": "PTT",
         "action": "Buy",
         "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XFTHTVE9T | Status : Pending(S)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 14:48:33",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XERH2P0N5 | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 14:48:11",
-        "symbol": "PTT",
-        "action": "Sell",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XERGPQMIP | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 13:48:13",
-        "symbol": "PTT",
-        "action": "Sell",
-        "volume": 100,
-        "price": 33,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "price": 33.75,
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
     },
     {
-        "timestamp": "2026-01-20 13:47:35",
+        "timestamp": "2026-01-23 15:01:19",
         "symbol": "PTT",
         "action": "Buy",
         "volume": 100,
         "price": 33,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
+        "detail": "Status : Rejected(RS) | Reason : Order is rejected",
         "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-20 13:03:17",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-20 12:57:05",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-20 12:27:58",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Cannot place Market or Market to Limit order when market is not open",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-20 11:30:54",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XEM1013BL | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 11:23:29",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XELTMZWAP | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 11:22:43",
-        "symbol": "KBANK",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XELSVW14H | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 11:18:53",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XELP2UIN5 | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 11:18:19",
-        "symbol": "AOT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No : 5XELOIJAKH | Status : Matched(M)",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 11:08:07",
-        "symbol": "AOT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No: 5XELEE88LD",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 11:06:24",
-        "symbol": "AOT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 33,
-        "detail": "Order No: 5XELCOY4U9",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 11:01:07",
-        "symbol": "AOT",
-        "action": "Buy",
-        "volume": 50,
-        "price": 33,
-        "detail": "Cannot set condition for odd lot board",
-        "status": "ERROR"
-    },
-    {
-        "timestamp": "2026-01-20 10:42:59",
-        "symbol": "AOT",
-        "action": "Buy",
-        "volume": 100,
-        "price": 52.75,
-        "detail": "Order No: 5XEKPG5JI1",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 10:34:47",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 200,
-        "price": 40.25,
-        "detail": "Order No: 5XEKHBE3QX",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 10:32:55",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 200,
-        "price": 40.25,
-        "detail": "Order No: 5XEKFGYU3L",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-20 10:23:47",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 200,
-        "price": 40.25,
-        "detail": "Order No: 5XEK6FH7ZT",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-19 16:15:51",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 300,
-        "price": 33,
-        "detail": "Order No: 5XDJXW0QSH",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-19 14:48:25",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 300,
-        "price": 33,
-        "detail": "Order No: 5XDHJ66GXD",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-19 14:46:05",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 300,
-        "price": 33,
-        "detail": "Order No: 5XDHGUVY61",
-        "status": "SUCCESS"
-    },
-    {
-        "timestamp": "2026-01-19 13:06:47",
-        "symbol": "PTT",
-        "action": "Buy",
-        "volume": 300,
-        "price": 33,
-        "status": "ERROR",
-        "detail": "Cannot place Market or Market to Limit order when market is not open"
     }
 ]
