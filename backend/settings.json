@@ -5,5 +5,7 @@
     "budget_per_trade": 5000.0,
     "fixed_volume": 100,
     "telegram_bot_token": "8339859004:AAGF27IlemJck-gcExJuQM6by7x_zySukF0",
-    "telegram_chat_id": "-5241207398"
+    "telegram_chat_id": "-5241207398",
+    "is_max_loss_active": false,
+    "max_loss_amount": 5000.0
 }

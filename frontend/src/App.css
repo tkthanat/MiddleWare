@@ -1,0 +1,79 @@
+/* GLOBAL DASHBOARD STYLE */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    background-color: #F3F4F6;
+    font-family: 'Inter', sans-serif;
+}
+
+.bg-dashboard {
+    background-color: #F3F4F6;
+}
+
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+
+/* NAVIGATION PILLS */
+.nav-pills-custom {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+}
+.nav-link.active-tab {
+    background-color: #F3F4F6;
+    color: #111827;
+}
+.nav-link:hover {
+    background-color: #f9fafb;
+}
+
+/* DASHBOARD CARDS */
+.dashboard-card {
+    background: #FFFFFF;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* เงานุ่ม */
+    transition: transform 0.2s;
+}
+
+/* FORM INPUTS MODERN */
+.form-control-modern {
+    background-color: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-weight: 500;
+    color: #374151;
+}
+.form-control-modern:focus {
+    background-color: #fff;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* TABLE MODERN */
+.custom-table thead th {
+    background-color: #F9FAFB;
+    border-bottom: 1px solid #E5E7EB;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+.custom-table td {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+/* EMERGENCY BUTTON */
+.btn-emergency {
+    background: #EF4444;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.btn-emergency:hover {
+    background: #DC2626;
+    transform: scale(1.02);
+}
+
+/* UTILS */
+.ls-1 { letter-spacing: 0.5px; }
