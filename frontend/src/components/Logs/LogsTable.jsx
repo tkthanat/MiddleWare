@@ -31,7 +31,7 @@ const LogsTable = ({
   return (
     <div className="card dashboard-card border-0 shadow-sm">
       
-      {/* 🟢 Header: Responsive Wrapper */}
+      {/* Header */}
       <div className="card-header bg-white border-0 pt-4 px-4 pb-2">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
             
@@ -40,10 +40,10 @@ const LogsTable = ({
                 <h5 className="fw-bold text-dark m-0">Trade History Table</h5>
             </div>
 
-            {/* Tools Bar: Mobile=Column, Tablet+=Row */}
+            {/* Tools Bar */}
             <div className="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
                 
-                {/* 1. Filter Buttons: Mobile=Scrollable/FullWidth */}
+                {/* Filter Buttons */}
                 <div className="btn-group w-100 w-sm-auto" role="group">
                     {[
                         { label: 'All', value: 'ALL' },
@@ -66,7 +66,7 @@ const LogsTable = ({
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                whiteSpace: 'nowrap' // ป้องกันข้อความตัดบรรทัด
+                                whiteSpace: 'nowrap'
                             }}
                         >
                             {btn.label}
@@ -74,7 +74,7 @@ const LogsTable = ({
                     ))}
                 </div>
 
-                {/* 2. Search Box: Responsive Width via CSS */}
+                {/* Search Box */}
                 <div className="input-group input-group-sm search-box-responsive" style={{ height: '34px' }}>
                     <span className="input-group-text bg-white border-end-0 ps-3 text-muted">
                         <FaSearch size={12}/>
@@ -92,7 +92,6 @@ const LogsTable = ({
         </div>
       </div>
 
-       {/* 🟡 ส่วนตาราง (คงเดิม) */}
        <div className="card-body px-0">
         <div className="table-responsive">
           <table className="table table-hover align-middle custom-table mb-0 table-fixed-layout">
@@ -138,7 +137,7 @@ const LogsTable = ({
           </table>
         </div>
         
-        {/* Pagination Section (คงเดิม) */}
+        {/* Pagination Section */}
         <div className="d-flex justify-content-between align-items-center px-4 py-3 border-top">
            <div className="d-flex align-items-center gap-2 text-muted small">
               <FaCircle className="text-success" size={8}/> System Health: OK
