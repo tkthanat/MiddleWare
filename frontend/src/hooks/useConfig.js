@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 
 export const useConfig = () => {
     const [formData, setFormData] = useState({
-        account_no: '', pin: '', trade_mode: 'AMOUNT', budget_per_trade: 0,
-        fixed_volume: 0, telegram_bot_token: '', telegram_chat_id: '',
-        is_max_loss_active: false, max_loss_amount: 0
+        account_no: '', 
+        derivatives_account: '',
+        active_symbols: '',
+        pin: '', 
+        trade_mode: 'AMOUNT', 
+        budget_per_trade: 0,
+        fixed_volume: 0, 
+        telegram_bot_token: '', 
+        telegram_chat_id: '',
+        is_max_loss_active: false, 
+        max_loss_amount: 0
     });
     
     const [showToast, setShowToast] = useState(false);
@@ -14,9 +22,12 @@ export const useConfig = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try { 
-                const res = await axios.get('http://localhost:8000/api/settings'); 
-                setFormData(res.data); 
-            } catch (e) { console.error(e); }
+                const res = await axios.get('/api/settings'); 
+                setFormData(prev => ({
+                    ...prev,
+                    ...res.data
+                })); 
+            } catch (e) { console.error("Load Config Error:", e); }
         };
         fetchSettings();
     }, []);
@@ -41,13 +52,12 @@ export const useConfig = () => {
     const saveSettings = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8000/api/settings', formData);
+            await axios.post('/api/settings', formData);
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Save Config Error:", e); }
     };
 
-    // Test Notification
     const handleTestNotification = () => {
         setTestMsgStatus(true);
         setTimeout(() => setTestMsgStatus(false), 3000);
