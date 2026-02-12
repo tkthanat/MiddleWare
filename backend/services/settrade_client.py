@@ -16,6 +16,11 @@ except Exception as e:
     market = None
 
 def get_equity_instance(account_no):
-    if investor:
-        return investor.Equity(account_no=account_no)
-    return None
+    if not investor or not account_no:
+        return None
+    
+    # Smart Routing Logic : ตรวจสอบประเภทบัญชีจาก Suffix
+    if account_no.strip().upper().endswith("-D"):
+        return investor.Derivatives(account_no=account_no)
+    
+    return investor.Equity(account_no=account_no)

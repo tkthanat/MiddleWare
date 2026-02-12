@@ -7,8 +7,17 @@ const LogsTable = ({
 }) => {
 
   const getStatusPill = (status) => {
-     if(status === 'SUCCESS') return <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3"><FaCheck className="me-1"/> Executed</span>;
-     if(status === 'SKIPPED') return <span className="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3"><FaShieldAlt className="me-1"/> Skipped</span>;
+     // SUCCESS
+     if(status === 'SUCCESS' || status === 'Success') {
+         return <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3"><FaCheck className="me-1"/> Success</span>;
+     }
+     
+     // SKIPPED
+     if(status === 'SKIPPED' || status === 'Skipped') {
+         return <span className="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3"><FaShieldAlt className="me-1"/> Skipped</span>;
+     }
+
+     // Failed, ERROR, REJECTED
      return <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3"><FaTimes className="me-1"/> Failed</span>;
   };
 
@@ -19,41 +28,71 @@ const LogsTable = ({
       return [1, currentPage -1 , currentPage, '...', totalPages];
   };
 
-  const FilterButton = ({ label, type }) => (
-      <button 
-          className={`btn btn-sm fw-bold border ${filterType === type ? 'btn-primary text-white' : 'btn-light text-muted'}`}
-          onClick={() => onFilterChange(type)}
-      >
-          {label}
-      </button>
-  );
-
   return (
     <div className="card dashboard-card border-0 shadow-sm">
-      <div className="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between flex-wrap gap-3">
-          <h5 className="fw-bold text-dark mb-0">Trade History Table</h5>
-          <div className="d-flex gap-2">
-              
-              <div className="btn-group">
-                  <FilterButton label="All" type="ALL" />
-                  <FilterButton label="Today" type="TODAY" />
-                  <FilterButton label="Yesterday" type="YESTERDAY" />
-                  <FilterButton label="Last 7 Days" type="LAST_7_DAYS" />
-              </div>
+      
+      {/* 🟢 Header: Responsive Wrapper */}
+      <div className="card-header bg-white border-0 pt-4 px-4 pb-2">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            
+            {/* Title */}
+            <div className="d-flex align-items-center w-100 w-md-auto">
+                <h5 className="fw-bold text-dark m-0">Trade History Table</h5>
+            </div>
 
-              <div className="input-group input-group-sm" style={{width: '250px'}}>
-                  <span className="input-group-text bg-light border-end-0"><FaSearch className="text-muted"/></span>
-                  <input 
-                      type="text" 
-                      className="form-control bg-light border-start-0" 
-                      placeholder="Search ..."
-                      value={searchTerm}
-                      onChange={(e) => onSearchChange(e.target.value)}
-                  />
-              </div>
-          </div>
+            {/* Tools Bar: Mobile=Column, Tablet+=Row */}
+            <div className="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
+                
+                {/* 1. Filter Buttons: Mobile=Scrollable/FullWidth */}
+                <div className="btn-group w-100 w-sm-auto" role="group">
+                    {[
+                        { label: 'All', value: 'ALL' },
+                        { label: 'Today', value: 'TODAY' },
+                        { label: 'Yesterday', value: 'YESTERDAY' },
+                        { label: 'Last 7 Days', value: 'LAST_7_DAYS' }
+                    ].map((btn) => (
+                        <button
+                            key={btn.value}
+                            type="button"
+                            className={`btn btn-sm px-3 border ${
+                                filterType === btn.value 
+                                ? 'btn-primary text-white fw-bold' 
+                                : 'btn-light text-muted bg-white'
+                            }`}
+                            onClick={() => onFilterChange(btn.value)}
+                            style={{ 
+                                height: '34px',
+                                fontSize: '13px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                whiteSpace: 'nowrap' // ป้องกันข้อความตัดบรรทัด
+                            }}
+                        >
+                            {btn.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* 2. Search Box: Responsive Width via CSS */}
+                <div className="input-group input-group-sm search-box-responsive" style={{ height: '34px' }}>
+                    <span className="input-group-text bg-white border-end-0 ps-3 text-muted">
+                        <FaSearch size={12}/>
+                    </span>
+                    <input 
+                        type="text" 
+                        className="form-control bg-white border-start-0 ps-2" 
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        style={{ fontSize: '13px', height: '100%' }}
+                    />
+                </div>
+            </div>
+        </div>
       </div>
 
+       {/* 🟡 ส่วนตาราง (คงเดิม) */}
        <div className="card-body px-0">
         <div className="table-responsive">
           <table className="table table-hover align-middle custom-table mb-0 table-fixed-layout">
@@ -99,6 +138,7 @@ const LogsTable = ({
           </table>
         </div>
         
+        {/* Pagination Section (คงเดิม) */}
         <div className="d-flex justify-content-between align-items-center px-4 py-3 border-top">
            <div className="d-flex align-items-center gap-2 text-muted small">
               <FaCircle className="text-success" size={8}/> System Health: OK

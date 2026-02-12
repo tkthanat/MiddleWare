@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 
 export const useLogs = () => {
     const [logs, setLogs] = useState([]);
@@ -16,9 +16,9 @@ export const useLogs = () => {
 
     const fetchLogs = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/logs');
+            const res = await axios.get('/api/system/logs');
             setLogs(res.data);
-        } catch (error) { console.error(error); }
+        } catch (error) { console.error("Fetch Logs Error:", error); }
     };
 
     // Date Utility
@@ -54,24 +54,21 @@ export const useLogs = () => {
         return true;
     });
 
-    // Search Filter Logic
     const finalLogs = dateFilteredLogs.filter(log => {
         if (!searchTerm) return true;
         const term = searchTerm.toLowerCase();
         return log.timestamp.includes(term) || log.symbol.toLowerCase().includes(term);
     });
 
-    // Summary Calculation
     const logsForSummary = dateFilteredLogs; 
 
     const summary = {
         total: logsForSummary.length,
-        success: logsForSummary.filter(l => l.status === 'SUCCESS').length,
-        failed: logsForSummary.filter(l => l.status === 'ERROR' || l.status === 'REJECTED').length,
+        success: logsForSummary.filter(l => l.status === 'SUCCESS' || l.status === 'Success').length,
+        failed: logsForSummary.filter(l => l.status === 'ERROR' || l.status === 'REJECTED' || l.status === 'Failed').length,
         skipped: logsForSummary.filter(l => l.status === 'SKIPPED').length
     };
 
-    // Pagination Logic
     const totalPages = Math.ceil(finalLogs.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;

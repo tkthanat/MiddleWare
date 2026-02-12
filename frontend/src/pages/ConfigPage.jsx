@@ -12,6 +12,7 @@ import StrategyForm from '../components/Config/StrategyForm';
 import SafetyForm from '../components/Config/SafetyForm';
 import NotificationForm from '../components/Config/NotificationForm';
 import HealthCard from '../components/Config/HealthCard';
+import SymbolForm from '../components/Config/SymbolForm';
 import ModalPopup from '../components/Common/ModalPopup';
 import SaveBar from '../components/Config/SaveBar';
 import Toast from '../components/Common/Toast';
@@ -35,7 +36,7 @@ function ConfigPage() {
   };
 
   return (
-    <div className="container pb-5">
+    <div className="container pb-5 config-container">
       
       {/* Status Section */}
       <StatusCard 
@@ -47,20 +48,27 @@ function ConfigPage() {
       <form onSubmit={saveSettings}>
         {/* Main Config Grid */}
         <div className="row g-4 mb-4">
-           <div className="col-lg-4">
+           <div className="col-12 col-md-6 col-lg-4">
                <AccountForm data={formData} onChange={handleChange} />
            </div>
-           <div className="col-lg-4">
+           <div className="col-12 col-md-6 col-lg-4">
                <StrategyForm data={formData} onChange={handleChange} />
            </div>
-           <div className="col-lg-4">
+           <div className="col-12 col-md-6 col-lg-4">
                <SafetyForm data={formData} onChange={handleChange} />
            </div>
         </div>
 
+        {/* Whitelist Section */}
+        <div className="row g-4 mb-4">
+            <div className="col-12">
+                <SymbolForm data={formData} onChange={handleChange} />
+            </div>
+        </div>
+
         {/* Notification & Health Grid */}
         <div className="row g-4 mb-5">
-            <div className="col-lg-7">
+            <div className="col-12 col-lg-7">
                 <NotificationForm 
                     data={formData} 
                     onChange={handleChange} 
@@ -68,7 +76,7 @@ function ConfigPage() {
                     onTestClick={handleTestNotification}
                 />
             </div>
-            <div className="col-lg-5">
+            <div className="col-12 col-lg-5">
                 <HealthCard />
             </div>
         </div>
@@ -81,7 +89,6 @@ function ConfigPage() {
             onConfirm={handleConfirmToggle}
         />
 
-        {/* Toast */}
         <Toast 
             show={showToast} 
             onClose={() => setShowToast(false)} 
@@ -90,7 +97,9 @@ function ConfigPage() {
         />
 
         {/* Save Bar */}
-        <SaveBar isSystemOnline={isSystemOnline} />
+        <div className="save-bar-wrapper">
+            <SaveBar isSystemOnline={isSystemOnline} />
+        </div>
 
       </form>
     </div>

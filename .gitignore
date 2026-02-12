@@ -1,13 +1,31 @@
-# --- Backend ---
+# Global / System
+.DS_Store
+.vscode/
+.idea/
+
+# Backend
 __pycache__/
 *.py[cod]
+*$py.class
 venv/
+env/
 .env
+
+# Sensitive & Runtime Data
 settings.json
 trade_logs.json
 
-# --- Frontend ---
+# Logs
+*.log
+
+# Frontend
 node_modules/
 dist/
-.DS_Store
-.vscode/
+dist-ssr/
+*.local
+
+# Frontend Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
