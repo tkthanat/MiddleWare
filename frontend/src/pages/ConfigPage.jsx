@@ -7,6 +7,7 @@ import { useConfig } from '../hooks/useConfig';
 
 // Components
 import StatusCard from '../components/Config/StatusCard';
+import ApiConnectionForm from '../components/Config/ApiConnectionForm';
 import AccountForm from '../components/Config/AccountForm';
 import StrategyForm from '../components/Config/StrategyForm';
 import SafetyForm from '../components/Config/SafetyForm';
@@ -16,6 +17,7 @@ import SymbolForm from '../components/Config/SymbolForm';
 import ModalPopup from '../components/Common/ModalPopup';
 import SaveBar from '../components/Config/SaveBar';
 import Toast from '../components/Common/Toast';
+import WebhookCard from '../components/Config/WebhookCard';
 
 // CSS
 import '../css/ConfigPage.css';
@@ -46,6 +48,14 @@ function ConfigPage() {
       />
 
       <form onSubmit={saveSettings}>
+        
+        {/* API Connection */}
+        <div className="row mb-4">
+           <div className="col-12">
+               <ApiConnectionForm data={formData} onChange={handleChange} />
+           </div>
+        </div>
+
         {/* Main Config Grid */}
         <div className="row g-4 mb-4">
            <div className="col-12 col-md-6 col-lg-4">
@@ -59,9 +69,12 @@ function ConfigPage() {
            </div>
         </div>
 
-        {/* Whitelist Section */}
+        {/* Webhook & Whitelist Grid */}
         <div className="row g-4 mb-4">
-            <div className="col-12">
+            <div className="col-12 col-lg-6 d-flex">
+                <WebhookCard token={formData.webhook_token} />
+            </div>
+            <div className="col-12 col-lg-6 d-flex">
                 <SymbolForm data={formData} onChange={handleChange} />
             </div>
         </div>

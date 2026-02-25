@@ -16,6 +16,12 @@ class SettingsModel(BaseModel):
     telegram_chat_id: str = ""
     is_max_loss_active: bool = False
     max_loss_amount: float = 0.0
+    app_id: str = ""
+    app_secret: str = ""
+    broker_id: str = "SANDBOX"
+    app_code: str = "SANDBOX"
+    is_sandbox: bool = True
+    webhook_token: str = ""
 
 class SystemStatusModel(BaseModel):
     is_active: bool
@@ -73,4 +79,10 @@ class SystemSetting(Base):
     telegram_chat_id = Column(String, default="")
     is_max_loss_active = Column(Boolean, default=False)
     max_loss_amount = Column(Float, default=0.0)
+    app_id = Column(String, default="")
+    app_secret = Column(String, default="")
+    broker_id = Column(String, default="SANDBOX")
+    app_code = Column(String, default="SANDBOX")
+    is_sandbox = Column(Boolean, default=True)
+    webhook_token = Column(String, unique=True, index=True, nullable=True)
     user = relationship("User", back_populates="system_settings")

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
 from config import load_user_settings
-from services.settrade_client import get_equity_instance
+from services.settrade_client import get_equity_instance, get_derivatives_instance
 
 # Global Variable
 bot_app = None
@@ -26,6 +26,16 @@ async def get_user_by_chat_id(chat_id: str):
         return user, setting
     finally:
         db.close()
+
+# Helper to extract Time HH:mm:ss from ISO String
+def format_time(iso_string):
+    if not iso_string: return "-"
+    try:
+        if "T" in str(iso_string):
+            return str(iso_string).split("T")[1][:8]
+        return str(iso_string)[:8] 
+    except:
+        return str(iso_string)
 
 # Command Handlers
 async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -47,120 +57,151 @@ async def cmd_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user, setting = await get_user_by_chat_id(chat_id)
     
     if not user:
-        await update.message.reply_text("⛔ คุณไม่มีสิทธิ์ใช้งานระบบนี้ (Chat ID ไม่ตรงกับในระบบ)")
+        await update.message.reply_text("⛔ คุณไม่มีสิทธิ์ใช้งานระบบนี้")
         return
 
-    try:
-        equity = get_equity_instance(setting.account_no)
-        info = equity.get_account_info()
-        
-        line_available = info.get('lineAvailable', 0)
-        cash_balance = info.get('cashBalance', 0)
-        
-        cash_str = f"{cash_balance:,.2f}".rjust(15)
-        line_str = f"{line_available:,.2f}".rjust(15)
-        
-        msg = (
-            f"*Portfolio Summary* \n"
-            f"Account : `{setting.account_no}` \n"
-            f"```\n"
-            f"Cash Bal   : {cash_str}\n"
-            f"Line Avail : {line_str}\n"
-            f"```"
-        )
-        await update.message.reply_text(msg, parse_mode="Markdown")
-        
-    except Exception as e:
-        await update.message.reply_text(f"⚠️ Error checking balance: {e}")
+    msg = "*Portfolio Summary* \n \n"
+
+    # SET Account
+    if setting.account_no:
+        try:
+            equity = get_equity_instance(setting.account_no)
+            info = equity.get_account_info()
+            
+            cash = info.get('cashBalance', 0)
+            line = info.get('lineAvailable', 0)
+            
+            cash_str = f"{cash:,.2f}".rjust(15)
+            line_str = f"{line:,.2f}".rjust(15)
+            
+            msg += f"*SET Acc :* `{setting.account_no}`\n"
+            msg += "```\n"
+            msg += f"Cash Bal   : {cash_str}\n"
+            msg += f"Line Avail : {line_str}\n"
+            msg += "```\n"
+        except Exception as e:
+            msg += f"⚠️ SET Error: {e}\n"
+
+    # TFEX Account
+    if setting.derivatives_account:
+        try:
+            tfex = get_derivatives_instance(setting.derivatives_account)
+            info = tfex.get_account_info()
+
+            equity_val = info.get('equity', info.get('equityBalance', 0))
+            excess_val = info.get('excessEquity', 0)
+            
+            eq_str = f"{equity_val:,.2f}".rjust(15)
+            ee_str = f"{excess_val:,.2f}".rjust(15)
+
+            msg += f"*TFEX Acc :* `{setting.derivatives_account}`\n"
+            msg += "```\n"
+            msg += f"Equity     : {eq_str}\n"
+            msg += f"EE (Avail) : {ee_str}\n"
+            msg += "```\n"
+        except Exception as e:
+            msg += f"⚠️ TFEX Error: {e}\n"
+
+    await update.message.reply_text(msg, parse_mode="Markdown")
 
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     user, setting = await get_user_by_chat_id(chat_id)
     if not user: return
 
-    try:
-        equity = get_equity_instance(setting.account_no)
-        orders = equity.get_orders()
+    active_orders = []
+    
+    # SET
+    if setting.account_no:
+        try:
+            equity = get_equity_instance(setting.account_no)
+            orders = equity.get_orders()
+            if orders:
+                for o in orders: o['mkt_type'] = 'SET'
+                active_orders.extend(orders)
+        except: pass
+
+    # TFEX
+    if setting.derivatives_account:
+        try:
+            tfex = get_derivatives_instance(setting.derivatives_account)
+            orders = tfex.get_orders()
+            if orders:
+                for o in orders: o['mkt_type'] = 'TFEX'
+                active_orders.extend(orders)
+        except: pass
+
+    # Filter Pending
+    ignore_statuses = ['Matched', 'Cancelled', 'Rejected', 'Expired', 'Error', 'Failed', 'Success']
+    filtered_orders = [
+        o for o in active_orders 
+        if not any(k in o.get('showOrderStatus', 'Unknown') for k in ignore_statuses)
+    ]
+
+    if not filtered_orders:
+        await update.message.reply_text("✅ *พอร์ตว่างครับ* (ไม่มีออเดอร์ค้าง)", parse_mode="Markdown")
+        return
+
+    msg = f"*Pending Orders ({len(filtered_orders)})*\n"
+    msg += "```\n"
+    msg += "Order No |   Time   | Side |   Symbol    |  Vol   | Price\n"
+    msg += "----------------------------------------------------------\n"
+
+    for o in filtered_orders:
+        ord_no = str(o.get('orderNo', ''))[-8:].ljust(8)
+        time_str = format_time(o.get('entryTime', '-')).center(8)
+        side = o.get('side', '').strip().upper()[:4].ljust(4)
+        sym = o.get('symbol', '').ljust(11)
+        vol = f"{o.get('vol', 0):,}".rjust(6)
+        pri = str(o.get('price', 'MKT')).rjust(6)
         
-        # Logic การกรอง Status สำหรับ Pending
-        ignore_statuses = ['Matched', 'Cancelled', 'Rejected', 'Expired', 'Error', 'Failed', 'Success']
-        
-        active_orders = []
-        for o in orders:
-            status = o['showOrderStatus']
-            if any(keyword in status for keyword in ignore_statuses):
-                continue
-            active_orders.append(o)
+        msg += f"{ord_no} | {time_str} | {side} | {sym} | {vol} | {pri}\n"
+    
+    msg += "```"
+    await update.message.reply_text(msg, parse_mode="Markdown")
 
-        if not active_orders:
-            await update.message.reply_text("✅ *พอร์ตว่างครับ* (ไม่มีออเดอร์ค้าง)", parse_mode="Markdown")
-            return
-
-        # Header และจัดรูปแบบการแสดงผลแบบตาราง
-        msg = f"*Pending Orders ({len(active_orders)})*\n"
-        msg += "```\n"
-
-        for o in active_orders:
-            side = o['side'].ljust(4)             
-            symbol = o['symbol'].ljust(8)         
-            vol = f"{o['vol']:,}".rjust(8)        
-            price = str(o.get('price', 'MKT')).rjust(6) 
-            
-            msg += f"{side} {symbol} | {vol} @ {price}\n"
-            msg += f"-> Status: {o['showOrderStatus']} \n"
-            msg += f"-> Order ID: {o['orderNo']} \n\n"
-        
-        msg += "```"
-        await update.message.reply_text(msg, parse_mode="Markdown")
-
-    except Exception as e:
-        await update.message.reply_text(f"⚠️ Error: {e}")
-
-# Check Match Order
 async def cmd_status_match(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     user, setting = await get_user_by_chat_id(chat_id)
     if not user: return
 
-    try:
-        equity = get_equity_instance(setting.account_no)
-        orders = equity.get_orders()
-        
-        # Logic การกรอง Status ค้นหาคำว่า Matched หรือ Success
-        match_keywords = ['Matched', 'Match', 'Success']
-        
-        matched_orders = []
-        for o in orders:
-            status = o['showOrderStatus']
-            if any(keyword in status for keyword in match_keywords):
-                matched_orders.append(o)
+    all_orders = []
+    if setting.account_no:
+        try:
+            orders = get_equity_instance(setting.account_no).get_orders()
+            if orders: all_orders.extend(orders)
+        except: pass
+    if setting.derivatives_account:
+        try:
+            orders = get_derivatives_instance(setting.derivatives_account).get_orders()
+            if orders: all_orders.extend(orders)
+        except: pass
 
-        if not matched_orders:
-            await update.message.reply_text("*ยังไม่มีออเดอร์ที่จับคู่สำเร็จครับ*", parse_mode="Markdown")
-            return
+    match_keywords = ['Matched', 'Match', 'Success']
+    matched_orders = [o for o in all_orders if any(k in o.get('showOrderStatus', 'Unknown') for k in match_keywords)]
 
-        msg = f"*Matched Orders ({len(matched_orders)})*\n"
-        msg += "```\n"
+    if not matched_orders:
+        await update.message.reply_text("*ยังไม่มีออเดอร์ที่จับคู่สำเร็จครับ*", parse_mode="Markdown")
+        return
+
+    msg = f"*Matched Orders ({len(matched_orders)})*\n"
+    msg += "```\n"
+    msg += "Order No |   Time   | Side |   Symbol    |  Vol   | Price\n"
+    msg += "----------------------------------------------------------\n"
+
+    for o in matched_orders:
+        ord_no = str(o.get('orderNo', ''))[-8:].ljust(8)
+        raw_time = o.get('tradeTime', o.get('entryTime', '-'))
+        time_str = format_time(raw_time).center(8)
+        side = str(o.get('side', '')).upper()[:4].ljust(4)
+        sym = str(o.get('symbol', '')).ljust(11)
+        vol = f"{o.get('vol', 0):,}".rjust(6)
+        pri = str(o.get('price', 'MKT')).rjust(6)
         
-        msg += "Order No |    Time    | Side | Symbol  |  Volume  | Price\n"
-        msg += "---------------------------------------------------------\n"
-
-        for o in matched_orders:
-            ord_no = str(o.get('orderNo', ''))[-8:].ljust(8)
-            time_raw = str(o.get('tradeTime', o.get('entryTime', '-')))
-            time_str = time_raw[:10].ljust(10)
-            side_str = str(o.get('side', '')).upper()[:4].ljust(4)
-            sym = str(o.get('symbol', '')).ljust(7)
-            vol = f"{o.get('vol', 0):,}".rjust(8)
-            pri = str(o.get('price', 'MKT')).rjust(5)
-            
-            msg += f"{ord_no} | {time_str} | {side_str} | {sym} | {vol} | {pri}\n"
-        
-        msg += "```"
-        await update.message.reply_text(msg, parse_mode="Markdown")
-
-    except Exception as e:
-        await update.message.reply_text(f"⚠️ Error fetching matched orders: {e}")
+        msg += f"{ord_no} | {time_str} | {side} | {sym} | {vol} | {pri}\n"
+    
+    msg += "```"
+    await update.message.reply_text(msg, parse_mode="Markdown")
 
 async def cmd_cancel_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
@@ -169,75 +210,69 @@ async def cmd_cancel_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("🔥 *กำลังดำเนินการยกเลิกทุกออเดอร์...*", parse_mode="Markdown")
 
-    try:
-        equity = get_equity_instance(setting.account_no)
-        pin = setting.pin
-        orders = equity.get_orders()
-        
-        cancelable_orders = [o for o in orders if o['canCancel'] == True]
+    count = 0
+    # Cancel SET
+    if setting.account_no:
+        try:
+            eq = get_equity_instance(setting.account_no)
+            orders = eq.get_orders()
+            for o in orders:
+                if o.get('canCancel'):
+                    eq.cancel_order(order_no=o['orderNo'], pin=setting.pin)
+                    count += 1
+        except: pass
+    
+    # Cancel TFEX
+    if setting.derivatives_account:
+        try:
+            tfex = get_derivatives_instance(setting.derivatives_account)
+            orders = tfex.get_orders()
+            for o in orders:
+                if o.get('canCancel'):
+                    tfex.cancel_order(order_no=o['orderNo'], pin=setting.pin)
+                    count += 1
+        except: pass
 
-        if not cancelable_orders:
-            await update.message.reply_text("✅ *ปลอดภัย:* ไม่มีออเดอร์ให้ยกเลิกครับ", parse_mode="Markdown")
-            return
-
-        count = 0
-        for o in cancelable_orders:
-            try:
-                equity.cancel_order(order_no=o['orderNo'], pin=pin)
-                count += 1
-            except Exception as e:
-                print(f"Failed to cancel {o['orderNo']}: {e}")
-
-        await update.message.reply_text(
-            f"🚫 *Panic Cancel Completed* \n"
-            f"```\n"
-            f"Canceled : {count} orders\n"
-            f"```\n"
-            f"✅ เคลียร์พอร์ตเรียบร้อยครับ", 
-            parse_mode="Markdown"
-        )
-
-    except Exception as e:
-        await update.message.reply_text(f"⚠️ Panic Error: {e}")
+    await update.message.reply_text(f"🚫 *Panic Cancel Completed* \nCanceled : {count} orders\n✅ เคลียร์พอร์ตเรียบร้อยครับ", parse_mode="Markdown")
 
 async def cmd_cancel_symbol(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-    
     match = re.match(r"^/cancel_([A-Za-z0-9]+)$", text)
     if not match: return
 
     target_symbol = match.group(1).upper()
-    
     chat_id = update.effective_chat.id
     user, setting = await get_user_by_chat_id(chat_id)
     if not user: return
 
-    try:
-        equity = get_equity_instance(setting.account_no)
-        pin = setting.pin
-        orders = equity.get_orders()
+    count = 0
+    
+    # Cancel SET
+    if setting.account_no:
+        try:
+            eq = get_equity_instance(setting.account_no)
+            orders = eq.get_orders()
+            for o in orders:
+                if o['symbol'] == target_symbol and o.get('canCancel'):
+                    eq.cancel_order(o['orderNo'], pin=setting.pin)
+                    count += 1
+        except: pass
 
-        target_orders = [o for o in orders if o['symbol'] == target_symbol and o['canCancel'] == True]
+    # Cancel TFEX
+    if setting.derivatives_account:
+        try:
+            tfex = get_derivatives_instance(setting.derivatives_account)
+            orders = tfex.get_orders()
+            for o in orders:
+                if o['symbol'] == target_symbol and o.get('canCancel'):
+                    tfex.cancel_order(o['orderNo'], pin=setting.pin)
+                    count += 1
+        except: pass
 
-        if not target_orders:
-            await update.message.reply_text(f"🔍 ไม่พบออเดอร์ *{target_symbol}* ที่ยกเลิกได้ครับ", parse_mode="Markdown")
-            return
-
-        for o in target_orders:
-            equity.cancel_order(order_no=o['orderNo'], pin=pin)
-        
-        await update.message.reply_text(
-            f"🗑️ *Cancel Order* \n"
-            f"```\n"
-            f"Symbol   : {target_symbol}\n"
-            f"Canceled : {len(target_orders)} orders\n"
-            f"```\n"
-            f"✅ ยกเลิกเรียบร้อย", 
-            parse_mode="Markdown"
-        )
-
-    except Exception as e:
-        await update.message.reply_text(f"⚠️ Error canceling {target_symbol}: {e}")
+    if count > 0:
+        await update.message.reply_text(f"🗑️ ยกเลิก *{target_symbol}* เรียบร้อย ({count} รายการ)", parse_mode="Markdown")
+    else:
+        await update.message.reply_text(f"🔍 ไม่พบออเดอร์ *{target_symbol}* ที่ยกเลิกได้ครับ", parse_mode="Markdown")
 
 # Startup Logic
 async def start_telegram_bot():

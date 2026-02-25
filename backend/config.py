@@ -20,7 +20,13 @@ async def load_user_settings(user_id: int):
             "telegram_bot_token": setting.telegram_bot_token,
             "telegram_chat_id": setting.telegram_chat_id,
             "is_max_loss_active": setting.is_max_loss_active,
-            "max_loss_amount": setting.max_loss_amount
+            "max_loss_amount": setting.max_loss_amount,
+            "app_id": setting.app_id or "",
+            "app_secret": setting.app_secret or "",
+            "broker_id": setting.broker_id or "SANDBOX",
+            "app_code": setting.app_code or "SANDBOX",
+            "is_sandbox": setting.is_sandbox,
+            "webhook_token": setting.webhook_token
         }
     except Exception as e:
         print(f"Load Config Error: {e}")
