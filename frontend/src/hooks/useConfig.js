@@ -2,7 +2,14 @@ import { useState, useEffect } from 'react';
 import axios from '../api/axios';
 
 export const useConfig = () => {
+    // Initial State
     const [formData, setFormData] = useState({
+        app_id: '',
+        app_secret: '',
+        broker_id: 'SANDBOX',
+        app_code: 'SANDBOX',
+        is_sandbox: true,
+        webhook_token: '',
         account_no: '', 
         derivatives_account: '',
         active_symbols: '',
@@ -22,11 +29,13 @@ export const useConfig = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try { 
-                const res = await axios.get('/api/settings'); 
-                setFormData(prev => ({
-                    ...prev,
-                    ...res.data
-                })); 
+                const res = await axios.get('/api/settings');
+                if (res.data) {
+                    setFormData(prev => ({
+                        ...prev,
+                        ...res.data 
+                    }));
+                }
             } catch (e) { console.error("Load Config Error:", e); }
         };
         fetchSettings();
@@ -34,16 +43,23 @@ export const useConfig = () => {
 
     // Input Config
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        // รองรับทั้ง Event จริง และ Mock Event จาก ApiConnectionForm
+        const target = e.target || e; 
+        const { name, value, type, checked } = target;
+
         if (type === 'checkbox') {
             setFormData(prev => ({...prev, [name]: checked}));
             return;
         }
+        
+        // จัดการตัวเลข
         if (['budget_per_trade', 'fixed_volume', 'max_loss_amount'].includes(name)) {
            let numValue = parseFloat(value);
            if (isNaN(numValue) || numValue < 0) numValue = 0;
            setFormData(prev => ({...prev, [name]: numValue}));
-        } else {
+        } 
+        // จัดการ Text และ Boolean (โหมด Sandbox)
+        else {
            setFormData(prev => ({...prev, [name]: value}));
         }
     };
