@@ -11,6 +11,22 @@ venv/
 env/
 .env
 
+# Test Scripts
+stress_test.py
+test_api.py
+test_force_scheduler.py
+clear_ghost_orders.py
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+middleware.db
+
+# Local Testing Scripts
+test_*.py
+*_test.py
+
 # Sensitive & Runtime Data
 settings.json
 trade_logs.json

@@ -52,12 +52,12 @@ async def health_check_loop():
 # --- System Services Startup ---
 @app.on_event("startup")
 async def start_system_services():
-    # Start Scheduler
-    scheduler.add_job(sync_pending_orders, "interval", seconds=60)
+    # tart Scheduler
+    scheduler.add_job(sync_pending_orders, "interval", seconds=5)
     scheduler.start()
-    print("🚀 [System] Scheduler started! (Syncing every 60s)")
+    print("🚀 [System] Scheduler started! (Syncing every 5s)")
 
-    # Start Telegram Bot (รันเป็น Background Task)
+    # Start Telegram Bot
     asyncio.create_task(start_telegram_bot())
 
 # --- System Services Shutdown ---

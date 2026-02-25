@@ -9,6 +9,7 @@ from passlib.context import CryptContext
 import random
 import string
 from datetime import datetime, timedelta
+import uuid
 
 router = APIRouter(
     prefix="/auth",
@@ -165,8 +166,17 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
+    # สร้างตาราง UserSecurity
     new_security = models.UserSecurity(user_id=new_user.id, is_2fa_enabled=False)
     db.add(new_security)
+    
+    # สร้างตาราง SystemSetting ให้เลยตั้งแต่สมัคร พร้อมแจก Webhook Token ไม่ให้ซ้ำกัน
+    new_system_setting = models.SystemSetting(
+        user_id=new_user.id,
+        webhook_token=str(uuid.uuid4())
+    )
+    db.add(new_system_setting)
+
     db.commit()
 
     return {"status": "success", "message": "User created successfully", "username": new_user.username}
