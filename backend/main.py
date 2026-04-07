@@ -7,6 +7,9 @@ import models
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from services.scheduler_service import sync_pending_orders
 from services.telegram_bot import start_telegram_bot, stop_telegram_bot
+from services.tfex_margin import schedule_margin_update 
+from services.logger import auto_clean_logs
+from services.market_status import update_market_status_cache 
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -40,25 +43,57 @@ async def startup_event():
     asyncio.create_task(health_check_loop())
 
 async def health_check_loop():
-    from routers.settings import health_check
+    from database import SessionLocal
+    import models
+    from services.settrade_client import get_investor
+    from datetime import datetime
+    
     print("Health Check System: STARTED")
     while True:
         await asyncio.sleep(300)
+        db = SessionLocal()
         try:
-            await health_check()
-        except Exception:
-            pass
+            # Multi-User: ดึง User ทั้งหมดที่ Active มาวนลูปเช็ค
+            users = db.query(models.User).filter(models.User.is_active == True).all()
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            for user in users:
+                # get_investor จะพยายาม Reconnect ให้ด้วยถ้าพบว่าหลุด
+                inv = get_investor(user.id)
+                if inv is None:
+                    print(f"[{timestamp}] 🔴 Health Check [User {user.username}]: OFFLINE (Disconnected)")
+                
+        except Exception as e:
+            print(f"⚠️ Health Check Loop Error: {e}")
+        finally:
+            db.close()
 
 # --- System Services Startup ---
 @app.on_event("startup")
 async def start_system_services():
-    # tart Scheduler
-    scheduler.add_job(sync_pending_orders, "interval", seconds=5)
+    # Start Scheduler
+    scheduler.add_job(sync_pending_orders, "interval", seconds=15)
+    
+    # Auto-Clean Logs
+    scheduler.add_job(auto_clean_logs, "cron", hour=3, minute=0) 
+    
+    # Background Polling
+    scheduler.add_job(update_market_status_cache, "interval", minutes=1)
+    
     scheduler.start()
-    print("🚀 [System] Scheduler started! (Syncing every 5s)")
+    print("🚀 [System] Scheduler started! (Syncing every 15s)")
+    print("🧹 [System] Auto-Clean Logs scheduled at 03:00 AM daily")
+    print("🌐 [System] Market Status Cache scheduled! (Every 1m)")
 
     # Start Telegram Bot
     asyncio.create_task(start_telegram_bot())
+    
+    # Start TFEX Margin Service
+    asyncio.create_task(schedule_margin_update())
+    print("🚀 [System] TFEX Margin Service started!")
+
+    # Start Market Status Cache Update (Immediate)
+    asyncio.create_task(update_market_status_cache())
 
 # --- System Services Shutdown ---
 @app.on_event("shutdown")

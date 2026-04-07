@@ -72,7 +72,14 @@ def get_trade_logs(
             "volume": log.volume,
             "price": log.price,
             "status": log.status,
-            "detail": log.detail
+            "detail": log.detail,
+            "order_no": log.order_no or "-",
+            "account_no": log.account_no or "-",
+            "matched_volume": log.matched_volume or 0,
+            "cancelled_volume": log.cancelled_volume or 0,
+            "reject_code": log.reject_code,
+            "reject_reason": log.reject_reason or "-",
+            "order_type": log.order_type or "-"
         }
         for log in logs
     ]

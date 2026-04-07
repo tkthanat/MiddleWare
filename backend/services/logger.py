@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import TradeLog
@@ -51,5 +51,20 @@ def get_trade_logs():
             }
             for log in logs
         ]
+    finally:
+        db.close()
+
+# Auto-Clean Logs
+def auto_clean_logs(days_to_keep=30):
+    db: Session = SessionLocal()
+    try:
+        cutoff_date = datetime.now() - timedelta(days=days_to_keep)
+        # ลบ Log ที่เก่ากว่า cutoff_date
+        deleted_count = db.query(TradeLog).filter(TradeLog.timestamp < cutoff_date).delete()
+        db.commit()
+        if deleted_count > 0:
+            print(f"🧹 [Auto-Clean] ลบ Trade Log ที่เก่ากว่า {days_to_keep} วัน จำนวน {deleted_count} รายการ สำเร็จ!")
+    except Exception as e:
+        print(f"❌ [Auto-Clean] Error: {e}")
     finally:
         db.close()

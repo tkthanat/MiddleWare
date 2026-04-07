@@ -4,6 +4,7 @@ import ConfigPage from './pages/ConfigPage';
 import LogsPage from './pages/LogsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPassword from './pages/ForgotPassword';
 import { AuthProvider } from './context/AuthProvider';
 import { AuthContext } from './context/AuthContext';
 import { FaCog, FaList, FaUserCircle, FaSignOutAlt, FaTimes, FaChevronRight } from 'react-icons/fa';
@@ -13,7 +14,7 @@ import Settings from './pages/Settings';
 // --- Navigation Bar ---
 function Navigation() {
   const location = useLocation();
-  if (location.pathname === '/login' || location.pathname === '/register') return null;
+  if (location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password') return null;
 
   return (
     <div className="d-flex justify-content-center pt-4 pb-3">
@@ -55,7 +56,7 @@ const FloatingProfile = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [menuRef]);
 
-    const shouldHide = location.pathname === '/login' || !user;
+    const shouldHide = location.pathname === '/login' || location.pathname === '/forgot-password' || !user;
     if (shouldHide) return null;
 
     return (
@@ -89,7 +90,7 @@ const FloatingProfile = () => {
                     </div>
 
                     <div className="menu-item" onClick={logout}>
-                        <div className="menu-icon-box" style={{backgroundColor: '#fef2f2', color: '#ef4444'}}> {/* ปุ่ม Logout สีแดงอ่อน */}
+                        <div className="menu-icon-box" style={{backgroundColor: '#fef2f2', color: '#ef4444'}}>
                             <FaSignOutAlt size={16} />
                         </div>
                         <span className="flex-grow ms-2 fw-medium text-danger">Logout</span>
@@ -126,6 +127,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             
             <Route path="/" element={<PrivateRoute><ConfigPage /></PrivateRoute>} />
             <Route path="/logs" element={<PrivateRoute><LogsPage /></PrivateRoute>} />

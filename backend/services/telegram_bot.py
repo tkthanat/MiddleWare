@@ -65,42 +65,48 @@ async def cmd_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # SET Account
     if setting.account_no:
         try:
-            equity = get_equity_instance(setting.account_no)
-            info = equity.get_account_info()
-            
-            cash = info.get('cashBalance', 0)
-            line = info.get('lineAvailable', 0)
-            
-            cash_str = f"{cash:,.2f}".rjust(15)
-            line_str = f"{line:,.2f}".rjust(15)
-            
-            msg += f"*SET Acc :* `{setting.account_no}`\n"
-            msg += "```\n"
-            msg += f"Cash Bal   : {cash_str}\n"
-            msg += f"Line Avail : {line_str}\n"
-            msg += "```\n"
+            equity = get_equity_instance(user.id, setting.account_no)
+            if not equity:
+                msg += f"⚠️ SET Error: `Disconnected`\n"
+            else:
+                info = equity.get_account_info()
+                
+                cash = info.get('cashBalance', 0)
+                line = info.get('lineAvailable', 0)
+                
+                cash_str = f"{cash:,.2f}".rjust(15)
+                line_str = f"{line:,.2f}".rjust(15)
+                
+                msg += f"*SET Acc :* `{setting.account_no}`\n"
+                msg += "```\n"
+                msg += f"Cash Bal   : {cash_str}\n"
+                msg += f"Line Avail : {line_str}\n"
+                msg += "```\n"
         except Exception as e:
-            msg += f"⚠️ SET Error: {e}\n"
+            msg += f"⚠️ SET Error: `{e}`\n"
 
     # TFEX Account
     if setting.derivatives_account:
         try:
-            tfex = get_derivatives_instance(setting.derivatives_account)
-            info = tfex.get_account_info()
+            tfex = get_derivatives_instance(user.id, setting.derivatives_account)
+            if not tfex:
+                msg += f"⚠️ TFEX Error: `Disconnected`\n"
+            else:
+                info = tfex.get_account_info()
 
-            equity_val = info.get('equity', info.get('equityBalance', 0))
-            excess_val = info.get('excessEquity', 0)
-            
-            eq_str = f"{equity_val:,.2f}".rjust(15)
-            ee_str = f"{excess_val:,.2f}".rjust(15)
+                equity_val = info.get('equity', info.get('equityBalance', 0))
+                excess_val = info.get('excessEquity', 0)
+                
+                eq_str = f"{equity_val:,.2f}".rjust(15)
+                ee_str = f"{excess_val:,.2f}".rjust(15)
 
-            msg += f"*TFEX Acc :* `{setting.derivatives_account}`\n"
-            msg += "```\n"
-            msg += f"Equity     : {eq_str}\n"
-            msg += f"EE (Avail) : {ee_str}\n"
-            msg += "```\n"
+                msg += f"*TFEX Acc :* `{setting.derivatives_account}`\n"
+                msg += "```\n"
+                msg += f"Equity     : {eq_str}\n"
+                msg += f"EE (Avail) : {ee_str}\n"
+                msg += "```\n"
         except Exception as e:
-            msg += f"⚠️ TFEX Error: {e}\n"
+            msg += f"⚠️ TFEX Error: `{e}`\n"
 
     await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -114,28 +120,30 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # SET
     if setting.account_no:
         try:
-            equity = get_equity_instance(setting.account_no)
-            orders = equity.get_orders()
-            if orders:
-                for o in orders: o['mkt_type'] = 'SET'
-                active_orders.extend(orders)
+            equity = get_equity_instance(user.id, setting.account_no)
+            if equity:
+                orders = equity.get_orders()
+                if orders:
+                    for o in orders: o['mkt_type'] = 'SET'
+                    active_orders.extend(orders)
         except: pass
 
     # TFEX
     if setting.derivatives_account:
         try:
-            tfex = get_derivatives_instance(setting.derivatives_account)
-            orders = tfex.get_orders()
-            if orders:
-                for o in orders: o['mkt_type'] = 'TFEX'
-                active_orders.extend(orders)
+            tfex = get_derivatives_instance(user.id, setting.derivatives_account)
+            if tfex:
+                orders = tfex.get_orders()
+                if orders:
+                    for o in orders: o['mkt_type'] = 'TFEX'
+                    active_orders.extend(orders)
         except: pass
 
     # Filter Pending
-    ignore_statuses = ['Matched', 'Cancelled', 'Rejected', 'Expired', 'Error', 'Failed', 'Success']
+    ignore_statuses = ['MATCH', 'CANCEL', 'REJECT', 'EXPIRE', 'ERROR', 'FAIL', 'SUCCESS']
     filtered_orders = [
         o for o in active_orders 
-        if not any(k in o.get('showOrderStatus', 'Unknown') for k in ignore_statuses)
+        if not any(k in str(o.get('showOrderStatus', o.get('showStatus', o.get('status', 'Unknown')))).upper() for k in ignore_statuses)
     ]
 
     if not filtered_orders:
@@ -144,15 +152,24 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     msg = f"*Pending Orders ({len(filtered_orders)})*\n"
     msg += "```\n"
-    msg += "Order No |   Time   | Side |   Symbol    |  Vol   | Price\n"
-    msg += "----------------------------------------------------------\n"
+    msg += "Order No |   Time   |   Side   |   Symbol    |  Vol   | Price\n"
+    msg += "--------------------------------------------------------------\n"
 
     for o in filtered_orders:
         ord_no = str(o.get('orderNo', ''))[-8:].ljust(8)
         time_str = format_time(o.get('entryTime', '-')).center(8)
-        side = o.get('side', '').strip().upper()[:4].ljust(4)
+        raw_side = str(o.get('side', '')).strip().upper()
+        raw_pos = str(o.get('position', '')).strip().upper()
+        if raw_pos == "OPEN":
+            side_str = f"O-{raw_side[:5]}"
+        elif raw_pos == "CLOSE":
+            side_str = f"C-{raw_side[:5]}"
+        else:
+            side_str = raw_side[:8]
+            
+        side = side_str.ljust(8)
         sym = o.get('symbol', '').ljust(11)
-        vol = f"{o.get('vol', 0):,}".rjust(6)
+        vol = f"{o.get('vol', o.get('qty', 0)):,}".rjust(6)
         pri = str(o.get('price', 'MKT')).rjust(6)
         
         msg += f"{ord_no} | {time_str} | {side} | {sym} | {vol} | {pri}\n"
@@ -168,17 +185,25 @@ async def cmd_status_match(update: Update, context: ContextTypes.DEFAULT_TYPE):
     all_orders = []
     if setting.account_no:
         try:
-            orders = get_equity_instance(setting.account_no).get_orders()
-            if orders: all_orders.extend(orders)
+            eq = get_equity_instance(user.id, setting.account_no)
+            if eq:
+                orders = eq.get_orders()
+                if orders: all_orders.extend(orders)
         except: pass
+        
     if setting.derivatives_account:
         try:
-            orders = get_derivatives_instance(setting.derivatives_account).get_orders()
-            if orders: all_orders.extend(orders)
+            tf = get_derivatives_instance(user.id, setting.derivatives_account)
+            if tf:
+                orders = tf.get_orders()
+                if orders: all_orders.extend(orders)
         except: pass
 
-    match_keywords = ['Matched', 'Match', 'Success']
-    matched_orders = [o for o in all_orders if any(k in o.get('showOrderStatus', 'Unknown') for k in match_keywords)]
+    match_keywords = ['MATCH', 'SUCCESS']
+    matched_orders = [
+        o for o in all_orders 
+        if any(k in str(o.get('showOrderStatus', o.get('showStatus', o.get('status', 'Unknown')))).upper() for k in match_keywords)
+    ]
 
     if not matched_orders:
         await update.message.reply_text("*ยังไม่มีออเดอร์ที่จับคู่สำเร็จครับ*", parse_mode="Markdown")
@@ -186,16 +211,25 @@ async def cmd_status_match(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     msg = f"*Matched Orders ({len(matched_orders)})*\n"
     msg += "```\n"
-    msg += "Order No |   Time   | Side |   Symbol    |  Vol   | Price\n"
-    msg += "----------------------------------------------------------\n"
+    msg += "Order No |   Time   |   Side   |   Symbol    |  Vol   | Price\n"
+    msg += "--------------------------------------------------------------\n"
 
     for o in matched_orders:
         ord_no = str(o.get('orderNo', ''))[-8:].ljust(8)
         raw_time = o.get('tradeTime', o.get('entryTime', '-'))
         time_str = format_time(raw_time).center(8)
-        side = str(o.get('side', '')).upper()[:4].ljust(4)
+        raw_side = str(o.get('side', '')).strip().upper()
+        raw_pos = str(o.get('position', '')).strip().upper()
+        if raw_pos == "OPEN":
+            side_str = f"O-{raw_side[:5]}"
+        elif raw_pos == "CLOSE":
+            side_str = f"C-{raw_side[:5]}"
+        else:
+            side_str = raw_side[:8]
+            
+        side = side_str.ljust(8)
         sym = str(o.get('symbol', '')).ljust(11)
-        vol = f"{o.get('vol', 0):,}".rjust(6)
+        vol = f"{o.get('vol', o.get('qty', 0)):,}".rjust(6)
         pri = str(o.get('price', 'MKT')).rjust(6)
         
         msg += f"{ord_no} | {time_str} | {side} | {sym} | {vol} | {pri}\n"
@@ -214,23 +248,25 @@ async def cmd_cancel_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Cancel SET
     if setting.account_no:
         try:
-            eq = get_equity_instance(setting.account_no)
-            orders = eq.get_orders()
-            for o in orders:
-                if o.get('canCancel'):
-                    eq.cancel_order(order_no=o['orderNo'], pin=setting.pin)
-                    count += 1
+            eq = get_equity_instance(user.id, setting.account_no)
+            if eq:
+                orders = eq.get_orders()
+                for o in orders:
+                    if o.get('canCancel'):
+                        eq.cancel_order(order_no=o['orderNo'], pin=setting.pin)
+                        count += 1
         except: pass
     
     # Cancel TFEX
     if setting.derivatives_account:
         try:
-            tfex = get_derivatives_instance(setting.derivatives_account)
-            orders = tfex.get_orders()
-            for o in orders:
-                if o.get('canCancel'):
-                    tfex.cancel_order(order_no=o['orderNo'], pin=setting.pin)
-                    count += 1
+            tfex = get_derivatives_instance(user.id, setting.derivatives_account)
+            if tfex:
+                orders = tfex.get_orders()
+                for o in orders:
+                    if o.get('canCancel'):
+                        tfex.cancel_order(order_no=o['orderNo'], pin=setting.pin)
+                        count += 1
         except: pass
 
     await update.message.reply_text(f"🚫 *Panic Cancel Completed* \nCanceled : {count} orders\n✅ เคลียร์พอร์ตเรียบร้อยครับ", parse_mode="Markdown")
@@ -250,23 +286,25 @@ async def cmd_cancel_symbol(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Cancel SET
     if setting.account_no:
         try:
-            eq = get_equity_instance(setting.account_no)
-            orders = eq.get_orders()
-            for o in orders:
-                if o['symbol'] == target_symbol and o.get('canCancel'):
-                    eq.cancel_order(o['orderNo'], pin=setting.pin)
-                    count += 1
+            eq = get_equity_instance(user.id, setting.account_no)
+            if eq:
+                orders = eq.get_orders()
+                for o in orders:
+                    if o['symbol'] == target_symbol and o.get('canCancel'):
+                        eq.cancel_order(o['orderNo'], pin=setting.pin)
+                        count += 1
         except: pass
 
     # Cancel TFEX
     if setting.derivatives_account:
         try:
-            tfex = get_derivatives_instance(setting.derivatives_account)
-            orders = tfex.get_orders()
-            for o in orders:
-                if o['symbol'] == target_symbol and o.get('canCancel'):
-                    tfex.cancel_order(o['orderNo'], pin=setting.pin)
-                    count += 1
+            tfex = get_derivatives_instance(user.id, setting.derivatives_account)
+            if tfex:
+                orders = tfex.get_orders()
+                for o in orders:
+                    if o['symbol'] == target_symbol and o.get('canCancel'):
+                        tfex.cancel_order(o['orderNo'], pin=setting.pin)
+                        count += 1
         except: pass
 
     if count > 0:
@@ -279,7 +317,10 @@ async def start_telegram_bot():
     global bot_app
     
     db: Session = SessionLocal()
-    first_setting = db.query(models.SystemSetting).filter(models.SystemSetting.telegram_bot_token != None).first()
+    first_setting = db.query(models.SystemSetting).filter(
+        models.SystemSetting.telegram_bot_token != None,
+        models.SystemSetting.telegram_bot_token != ""
+    ).first()
     token = first_setting.telegram_bot_token if first_setting else None
     db.close()
 
