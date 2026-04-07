@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from '../api/axios';
+import Swal from 'sweetalert2';
 
 export const useConfig = () => {
     // Initial State
@@ -43,7 +44,6 @@ export const useConfig = () => {
 
     // Input Config
     const handleChange = (e) => {
-        // รองรับทั้ง Event จริง และ Mock Event จาก ApiConnectionForm
         const target = e.target || e; 
         const { name, value, type, checked } = target;
 
@@ -52,13 +52,11 @@ export const useConfig = () => {
             return;
         }
         
-        // จัดการตัวเลข
         if (['budget_per_trade', 'fixed_volume', 'max_loss_amount'].includes(name)) {
            let numValue = parseFloat(value);
            if (isNaN(numValue) || numValue < 0) numValue = 0;
            setFormData(prev => ({...prev, [name]: numValue}));
         } 
-        // จัดการ Text และ Boolean (โหมด Sandbox)
         else {
            setFormData(prev => ({...prev, [name]: value}));
         }
@@ -71,12 +69,53 @@ export const useConfig = () => {
             await axios.post('/api/settings', formData);
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
-        } catch (e) { console.error("Save Config Error:", e); }
+        } catch (e) { 
+            console.error("Save Config Error:", e); 
+            let errorMsg = "เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง";
+            if (e.response && e.response.data && e.response.data.detail) {
+                errorMsg = e.response.data.detail;
+            }
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'System Rejected!',
+                html: errorMsg,
+                width: 600,
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'รับทราบ',
+                customClass: { popup: 'rounded-4 shadow' }
+            });
+        }
     };
 
-    const handleTestNotification = () => {
-        setTestMsgStatus(true);
-        setTimeout(() => setTestMsgStatus(false), 3000);
+    const handleTestNotification = async () => {
+        if (!formData.telegram_bot_token || !formData.telegram_chat_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'ข้อมูลไม่ครบ',
+                text: 'กรุณากรอก Bot Token และ Chat ID ก่อนกดทดสอบครับ',
+                confirmButtonColor: '#0d6efd'
+            });
+            return;
+        }
+
+        try {
+            await axios.post('/api/test-telegram', {
+                telegram_bot_token: formData.telegram_bot_token,
+                telegram_chat_id: formData.telegram_chat_id
+            });
+            
+            setTestMsgStatus(true);
+            setTimeout(() => setTestMsgStatus(false), 3000);
+            
+        } catch (e) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Test Failed!',
+                text: 'ไม่สามารถส่งข้อความได้ กรุณาตรวจสอบ Token และ Chat ID อีกครั้ง',
+                confirmButtonColor: '#0d6efd'
+            });
+        }
     };
 
     return { 

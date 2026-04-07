@@ -64,9 +64,18 @@ export const useLogs = () => {
 
     const summary = {
         total: logsForSummary.length,
-        success: logsForSummary.filter(l => l.status === 'SUCCESS' || l.status === 'Success').length,
-        failed: logsForSummary.filter(l => l.status === 'ERROR' || l.status === 'REJECTED' || l.status === 'Failed').length,
-        skipped: logsForSummary.filter(l => l.status === 'SKIPPED').length
+        success: logsForSummary.filter(l => {
+            const s = (l.status || '').toUpperCase();
+            return s === 'SUCCESS' || s === 'MATCHED';
+        }).length,
+        failed: logsForSummary.filter(l => {
+            const s = (l.status || '').toUpperCase();
+            return s === 'ERROR' || s === 'REJECTED' || s === 'FAILED';
+        }).length,
+        skipped: logsForSummary.filter(l => {
+            const s = (l.status || '').toUpperCase();
+            return s === 'SKIPPED' || s === 'CANCELLED' || s === 'SUBMITTED' || s === 'QUEUED';
+        }).length
     };
 
     const totalPages = Math.ceil(finalLogs.length / itemsPerPage);

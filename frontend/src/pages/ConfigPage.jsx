@@ -21,6 +21,7 @@ import WebhookCard from '../components/Config/WebhookCard';
 
 // CSS
 import '../css/ConfigPage.css';
+import '../css/InfoPopover.css';
 
 function ConfigPage() {
   const { isSystemOnline, isSystemActive, toggleSystem } = useSystemStatus();
@@ -65,7 +66,7 @@ function ConfigPage() {
                <StrategyForm data={formData} onChange={handleChange} />
            </div>
            <div className="col-12 col-md-6 col-lg-4">
-               <SafetyForm data={formData} onChange={handleChange} />
+               <SafetyForm data={formData} onChange={handleChange} isSystemOk={isSystemOnline} />
            </div>
         </div>
 

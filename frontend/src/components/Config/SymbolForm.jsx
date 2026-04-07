@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react';
-import { FaList, FaPlus, FaTrashAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaList, FaPlus, FaTrashAlt, FaChevronLeft, FaChevronRight, FaInfoCircle } from 'react-icons/fa';
+
+const InfoIcon = ({ title, children, color }) => (
+  <div className="info-container ms-1">
+    <FaInfoCircle className={`info-icon ${color}`} style={{ fontSize: '0.9em' }} />
+    <div className="info-popover text-start" style={{ width: '320px' }}>
+      <div className="info-title">{title}</div>
+      <ul className="info-list">{children}</ul>
+    </div>
+  </div>
+);
 
 const SymbolForm = ({ data, onChange }) => {
   const [newSymbol, setNewSymbol] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 7;
+  const ITEMS_PER_PAGE = 8;
 
   const currentSymbolsString = data?.active_symbols || "";
   
@@ -55,12 +65,15 @@ const SymbolForm = ({ data, onChange }) => {
       <div className="card-body p-4 d-flex flex-column">
         
         {/* Header Section */}
-        <div className="d-flex justify-content-between mb-3">
-            <h6 className="fw-bold text-dark"><FaList className="me-2 text-muted"/> Whitelist Symbols</h6>
+        <div className="d-flex justify-content-between mb-4">
+            <h6 className="fw-bold text-dark d-flex align-items-center mb-0">
+              <FaList className="me-2 text-muted"/> Whitelist Symbols
+              <InfoIcon title="Whitelist Symbols" color="text-primary">
+                <li>กำหนดรายชื่อหุ้น (SET) หรือสัญญา (TFEX) ที่อนุญาตให้บอททำการเทรดได้</li>
+                <li><b>หากเว้นว่างไว้</b> บอทจะรับคำสั่งและส่งออเดอร์ทุกตัวที่เข้ามา</li>
+              </InfoIcon>
+            </h6>
         </div>
-        <p className="text-muted small mb-3">
-          กำหนดรายชื่อหุ้น (SET) หรือสัญญา (TFEX) ที่อนุญาตให้บอททำการเทรดได้ (หากเว้นว่างไว้ บอทจะรับคำสั่งทุกตัว)
-        </p>
         
         {/* ช่องกรอกเพิ่ม Symbol */}
         <div className="input-group mb-4 shadow-sm">

@@ -172,7 +172,9 @@ const LoginPage = () => {
                                 <input type="checkbox" style={{cursor:'pointer'}} /> 
                                 <span>Remember me</span>
                             </label>
-                            <span className="register-link">Forgot Password?</span>
+                            <Link to="/forgot-password" className="register-link" style={{textDecoration: 'none'}}>
+                                Forgot Password?
+                            </Link>
                         </div>
 
                         <button type="submit" className="btn-login-ref" disabled={loading}>
