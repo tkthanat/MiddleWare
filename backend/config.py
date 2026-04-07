@@ -14,9 +14,13 @@ async def load_user_settings(user_id: int):
             "derivatives_account": setting.derivatives_account or "",
             "active_symbols": setting.active_symbols or "",
             "pin": setting.pin,
+            "allocation_type": setting.allocation_type or "FIX",
             "trade_mode": setting.trade_mode,
             "budget_per_trade": setting.budget_per_trade,
             "fixed_volume": setting.fixed_volume,
+            "tfex_volume": setting.tfex_volume or 1,
+            "dynamic_percent": setting.dynamic_percent or 10.0,
+            "price_type": setting.price_type or "MP-MKT",
             "telegram_bot_token": setting.telegram_bot_token,
             "telegram_chat_id": setting.telegram_chat_id,
             "is_max_loss_active": setting.is_max_loss_active,
@@ -26,7 +30,9 @@ async def load_user_settings(user_id: int):
             "broker_id": setting.broker_id or "SANDBOX",
             "app_code": setting.app_code or "SANDBOX",
             "is_sandbox": setting.is_sandbox,
-            "webhook_token": setting.webhook_token
+            "webhook_token": setting.webhook_token,
+            "is_active_system": setting.is_active_system,
+            "auto_correct_board_lot": setting.auto_correct_board_lot
         }
     except Exception as e:
         print(f"Load Config Error: {e}")

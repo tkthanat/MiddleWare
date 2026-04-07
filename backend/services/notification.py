@@ -17,10 +17,24 @@ async def send_telegram_message(bot_token: str, chat_id: str, message: str):
         payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
         
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: requests.post(url, json=payload))
+        
+        # ฟังก์ชันช่วยยิง Request
+        def do_post(pl):
+            return requests.post(url, json=pl)
+
+        response = await loop.run_in_executor(None, do_post, payload)
+        
+        # Smart Retry
+        if response.status_code == 400 and "parse entities" in response.text.lower():
+            print(f"⚠️ [Telegram] Markdown Parse Error! Retrying as plain text...")
+            payload["parse_mode"] = ""
+            await loop.run_in_executor(None, do_post, payload)
+            
+        elif response.status_code != 200:
+            print(f"⚠️ [Telegram] Send Failed: {response.text}")
             
     except Exception as e:
-        print(f"Telegram Error: {e}")
+        print(f"⚠️ [Telegram] Exception: {e}")
 
 async def send_notification_smart(bot_token: str, chat_id: str, message: str, type="INFO"):
     global last_error_logs

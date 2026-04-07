@@ -1,41 +1,32 @@
 import sqlite3
 
-# ชื่อไฟล์ Database ของคุณ
-DB_NAME = "middleware.db"
-
-def migrate():
-    print(f"🔧 Starting Migration for {DB_NAME}...")
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        
-        # รายชื่อคอลัมน์ใหม่ที่จะเพิ่ม
-        new_columns = [
-            ("app_id", "TEXT DEFAULT ''"),
-            ("app_secret", "TEXT DEFAULT ''"),
-            ("broker_id", "TEXT DEFAULT 'SANDBOX'"),
-            ("app_code", "TEXT DEFAULT 'SANDBOX'"),
-            ("is_sandbox", "BOOLEAN DEFAULT 1")
-        ]
-
-        for col, col_type in new_columns:
-            try:
-                # คำสั่ง SQL เพิ่มคอลัมน์
-                cursor.execute(f"ALTER TABLE system_settings ADD COLUMN {col} {col_type}")
-                print(f"✅ Added column: {col}")
-            except Exception as e:
-                # ถ้ามีอยู่แล้วจะ Error ซึ่งเราจะข้ามไป
-                if "duplicate column name" in str(e):
-                    print(f"⚠️ Column {col} already exists. Skipped.")
-                else:
-                    print(f"❌ Error adding {col}: {e}")
-
-        conn.commit()
-        conn.close()
-        print("🎉 Database Migration Completed! You can run main.py now.")
-        
-    except Exception as e:
-        print(f"🔥 Critical Error: {e}")
+def upgrade_database():
+    print("⏳ กำลังเชื่อมต่อกับฐานข้อมูล middleware.db...")
+    conn = sqlite3.connect("middleware.db")
+    cursor = conn.cursor()
+    
+    # รายชื่อคอลัมน์ใหม่ที่ต้องการเพิ่ม
+    new_columns = [
+        ("order_no", "VARCHAR"),
+        ("account_no", "VARCHAR"),
+        ("matched_volume", "INTEGER DEFAULT 0"),
+        ("cancelled_volume", "INTEGER DEFAULT 0"),
+        ("reject_code", "INTEGER"),
+        ("reject_reason", "VARCHAR"),
+        ("order_type", "VARCHAR")
+    ]
+    
+    for col_name, col_type in new_columns:
+        try:
+            cursor.execute(f"ALTER TABLE trade_logs ADD COLUMN {col_name} {col_type}")
+            print(f"✅ เพิ่มคอลัมน์สำเร็จ: {col_name}")
+        except sqlite3.OperationalError as e:
+            # ดัก Error กรณีที่คอลัมน์นี้เคยถูกเพิ่มไปแล้ว
+            print(f"⚠️ ข้ามการทำงาน: คอลัมน์ '{col_name}' มีอยู่แล้วในตาราง")
+            
+    conn.commit()
+    conn.close()
+    print("🎉 อัปเกรดฐานข้อมูลเสร็จสมบูรณ์!")
 
 if __name__ == "__main__":
-    migrate()
+    upgrade_database()

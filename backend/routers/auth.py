@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import get_db
 from services import auth_handler
-from services.email_service import send_otp_email 
+from services.email_service import send_otp_email, send_forgot_password_email 
 import models
 from passlib.context import CryptContext
 import random
@@ -41,6 +41,18 @@ class RegisterRequest(BaseModel):
     full_name: str = None
     email: str | None = None
     phone: str | None = None
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class VerifyResetOTPRequest(BaseModel):
+    email: str
+    otp: str
+
+class ResetPasswordRequest(BaseModel):
+    email: str
+    otp: str
+    new_password: str
 
 def generate_otp(length=5):
     return ''.join(random.choices(string.digits, k=length))
@@ -166,11 +178,9 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    # สร้างตาราง UserSecurity
     new_security = models.UserSecurity(user_id=new_user.id, is_2fa_enabled=False)
     db.add(new_security)
     
-    # สร้างตาราง SystemSetting ให้เลยตั้งแต่สมัคร พร้อมแจก Webhook Token ไม่ให้ซ้ำกัน
     new_system_setting = models.SystemSetting(
         user_id=new_user.id,
         webhook_token=str(uuid.uuid4())
@@ -180,3 +190,82 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
 
     return {"status": "success", "message": "User created successfully", "username": new_user.username}
+
+# --- Forgot Password API ---
+@router.post("/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == request.email).first()
+    
+    if not user:
+        return {"status": "success", "message": "If email exists, OTP has been sent."}
+
+    security_setting = db.query(models.UserSecurity).filter(models.UserSecurity.user_id == user.id).first()
+    if not security_setting:
+        security_setting = models.UserSecurity(user_id=user.id)
+        db.add(security_setting)
+
+    otp_code = generate_otp(5)
+    expiry_time = datetime.now() + timedelta(minutes=5)
+    
+    security_setting.otp_code = otp_code
+    security_setting.otp_expiry = expiry_time
+    db.commit()
+
+    print(f"🔹 Generated Password Reset OTP for {user.username}: {otp_code}")
+    background_tasks.add_task(send_forgot_password_email, user.email, user.username, otp_code)
+
+    return {"status": "success", "message": "If email exists, OTP has been sent."}
+
+@router.post("/verify-reset-otp")
+async def verify_reset_otp(request: VerifyResetOTPRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == request.email).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid request")
+
+    security_setting = db.query(models.UserSecurity).filter(models.UserSecurity.user_id == user.id).first()
+    if not security_setting or not security_setting.otp_code:
+        raise HTTPException(status_code=400, detail="No active password reset request")
+
+    if str(security_setting.otp_code).strip() != str(request.otp).strip():
+        raise HTTPException(status_code=400, detail="Invalid OTP Code")
+
+    try:
+        expiry = security_setting.otp_expiry
+        if isinstance(expiry, str):
+            expiry = datetime.fromisoformat(expiry)
+        
+        if datetime.now() > expiry:
+            raise HTTPException(status_code=400, detail="OTP Expired")
+    except Exception as e:
+        print(f"⚠️ Date comparison error: {e}")
+
+    return {"status": "success", "message": "OTP Verified"}
+
+@router.post("/reset-password")
+async def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == request.email).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid request")
+
+    security_setting = db.query(models.UserSecurity).filter(models.UserSecurity.user_id == user.id).first()
+    if not security_setting or not security_setting.otp_code:
+        raise HTTPException(status_code=400, detail="No active password reset request")
+
+    if str(security_setting.otp_code).strip() != str(request.otp).strip():
+        raise HTTPException(status_code=400, detail="Invalid OTP Code")
+
+    try:
+        expiry = security_setting.otp_expiry
+        if isinstance(expiry, str):
+            expiry = datetime.fromisoformat(expiry)
+        
+        if datetime.now() > expiry:
+            raise HTTPException(status_code=400, detail="OTP Expired")
+    except Exception as e:
+        pass
+
+    user.hashed_password = pwd_context.hash(request.new_password)
+    security_setting.otp_code = None 
+    db.commit()
+
+    return {"status": "success", "message": "Password reset successfully"}

@@ -9,9 +9,13 @@ class SettingsModel(BaseModel):
     derivatives_account: str = ""
     active_symbols: str = ""
     pin: str = ""
+    allocation_type: str = "FIX"
     trade_mode: str = "AMOUNT"
     budget_per_trade: float = 5000.0
     fixed_volume: int = 100
+    tfex_volume: int = 1
+    dynamic_percent: float = 10.0
+    price_type: str = "MP-MKT"
     telegram_bot_token: str = ""
     telegram_chat_id: str = ""
     is_max_loss_active: bool = False
@@ -22,6 +26,7 @@ class SettingsModel(BaseModel):
     app_code: str = "SANDBOX"
     is_sandbox: bool = True
     webhook_token: str = ""
+    auto_correct_board_lot: bool = False
 
 class SystemStatusModel(BaseModel):
     is_active: bool
@@ -62,6 +67,13 @@ class TradeLog(Base):
     price = Column(Float, default=0.0)
     status = Column(String, nullable=True)
     detail = Column(String, nullable=True)
+    order_no = Column(String, nullable=True)
+    account_no = Column(String, nullable=True)
+    matched_volume = Column(Integer, default=0)
+    cancelled_volume = Column(Integer, default=0)
+    reject_code = Column(Integer, nullable=True)
+    reject_reason = Column(String, nullable=True)
+    order_type = Column(String, nullable=True)
 
 class SystemSetting(Base):
     __tablename__ = "system_settings"
@@ -72,9 +84,13 @@ class SystemSetting(Base):
     derivatives_account = Column(String, default="")
     active_symbols = Column(String, default="")
     pin = Column(String, default="")
+    allocation_type = Column(String, default="FIX")
     trade_mode = Column(String, default="AMOUNT")
     budget_per_trade = Column(Float, default=5000.0)
     fixed_volume = Column(Integer, default=100)
+    tfex_volume = Column(Integer, default=1)
+    dynamic_percent = Column(Float, default=10.0)
+    price_type = Column(String, default="MP-MKT")
     telegram_bot_token = Column(String, default="")
     telegram_chat_id = Column(String, default="")
     is_max_loss_active = Column(Boolean, default=False)
@@ -85,4 +101,5 @@ class SystemSetting(Base):
     app_code = Column(String, default="SANDBOX")
     is_sandbox = Column(Boolean, default=True)
     webhook_token = Column(String, unique=True, index=True, nullable=True)
+    auto_correct_board_lot = Column(Boolean, default=False)
     user = relationship("User", back_populates="system_settings")
