@@ -16,6 +16,31 @@ from services.market_status import check_market_status
 
 router = APIRouter()
 
+# ฟังก์ชันปัดเศษราคาให้ตรงกับ Tick Size ของ SET/TFEX
+def round_to_tick(price: float, symbol: str, market_type: str) -> float:
+    if price <= 0: return 0.0
+    
+    if market_type == "TFEX":
+        sym = symbol.upper()
+        if sym.startswith("S50"): tick = 0.1
+        elif sym.startswith("GO") or sym.startswith("GF") or sym.startswith("GZ") or sym.startswith("SV"): tick = 0.1
+        elif sym.startswith("USD"): tick = 0.01
+        elif sym.startswith("EUR") or sym.startswith("JPY"): tick = 0.0001
+        else: tick = 0.01 
+    else:
+        # กฎ Tick Size ของหุ้นไทย (SET)
+        if price < 2: tick = 0.01
+        elif price < 5: tick = 0.02
+        elif price < 10: tick = 0.05
+        elif price < 25: tick = 0.10
+        elif price < 100: tick = 0.25
+        elif price < 200: tick = 0.50
+        elif price < 400: tick = 1.00
+        else: tick = 2.00
+        
+    # คำนวณปัดเศษให้ตรงล็อก Tick Size
+    return round(round(price / tick) * tick, 4)
+
 # ฟังก์ชันเช็คว่าเป็นหุ้น หรือ TFEX
 def is_tfex(symbol: str, action: str) -> bool:
     symbol = symbol.upper().strip()
@@ -303,7 +328,7 @@ async def tradingview_webhook(webhook_token: str, request: Request, background_t
         if user_price_type == "Limit" and price > 0:
             final_price_type = "Limit"
             final_validity = "Day"
-            exec_price = price
+            exec_price = round_to_tick(price, symbol, market_type) # <-- แก้ไข: ใช้ฟังก์ชันปัดเศษ Tick Size
         else:
             final_price_type = user_price_type if user_price_type != "Limit" else "MP-MKT"
             final_validity = "IOC" if final_price_type in ["MP-MKT", "MP-MTL"] else "Day"
@@ -364,7 +389,7 @@ async def tradingview_webhook(webhook_token: str, request: Request, background_t
 
         log_id = save_trade_log({
             "timestamp": timestamp, "symbol": symbol, "action": raw_action,
-            "volume": calculated_volume, "price": price,
+            "volume": calculated_volume, "price": exec_price,
             "status": "SUBMITTED", "detail": f"Order No: {order_no} ({market_type})",
             "user_id": target_user.id
         })

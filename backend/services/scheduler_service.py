@@ -16,6 +16,27 @@ NOTIFIED_CACHE = set()
 IS_FIRST_RUN = True  
 LAST_HEARTBEAT = {}
 
+# ฟังก์ชันปัดเศษราคาให้ตรงกับ Tick Size ของ SET/TFEX
+def round_to_tick(price: float, symbol: str, market_type: str) -> float:
+    if price <= 0: return 0.0
+    if market_type == "TFEX":
+        sym = symbol.upper()
+        if sym.startswith("S50"): tick = 0.1
+        elif sym.startswith("GO") or sym.startswith("GF") or sym.startswith("GZ") or sym.startswith("SV"): tick = 0.1
+        elif sym.startswith("USD"): tick = 0.01
+        elif sym.startswith("EUR") or sym.startswith("JPY"): tick = 0.0001
+        else: tick = 0.01 
+    else:
+        if price < 2: tick = 0.01
+        elif price < 5: tick = 0.02
+        elif price < 10: tick = 0.05
+        elif price < 25: tick = 0.10
+        elif price < 100: tick = 0.25
+        elif price < 200: tick = 0.50
+        elif price < 400: tick = 1.00
+        else: tick = 2.00
+    return round(round(price / tick) * tick, 4)
+
 async def sync_pending_orders():
     global IS_FIRST_RUN, LAST_HEARTBEAT
     
@@ -126,7 +147,7 @@ async def sync_pending_orders():
                     try:
                         order_result = {}
                         pin = settings.get("pin")
-                        exec_price = round(w_order.price, 2) if final_price_type == "Limit" else 0.0
+                        exec_price = round_to_tick(w_order.price, w_order.symbol, market_type) if final_price_type == "Limit" else 0.0
 
                         if market_type == "TFEX":
                             api = get_derivatives_instance(user.id, settings.get("derivatives_account"))
