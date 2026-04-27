@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { FaLock, FaTimes } from 'react-icons/fa';
+import { FaLock, FaTimes, FaUser, FaSun, FaMoon } from 'react-icons/fa';
+import Logo from '../assets/Logo.png';
 import '../css/LoginPage.css';
 
 const LoginPage = () => {
     const navigate = useNavigate();
 
+    // State
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -18,13 +20,24 @@ const LoginPage = () => {
     const [otpError, setOtpError] = useState('');
     const [otpLoading, setOtpLoading] = useState(false);
 
+    // State สำหรับ Theme (Light / Dark)
+    const [theme, setTheme] = useState(localStorage.getItem('data-theme') || 'light');
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('data-theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    };
+
     // URL Backend
     const BASE_URL = "http://localhost:8000/auth";
 
     const handleLoginSuccess = (data) => {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('user_data', JSON.stringify(data));
-        
         window.location.href = '/'; 
     };
 
@@ -36,11 +49,9 @@ const LoginPage = () => {
         try {
             const res = await axios.post(`${BASE_URL}/login`, { username, password });
 
-            // Status success
             if (res.data.status === 'success') {
                 handleLoginSuccess(res.data);
             } 
-            // Status 2fa_required
             else if (res.data.status === '2fa_required') {
                 setShowOtpModal(true);
                 setLoading(false);
@@ -71,9 +82,9 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-page-wrapper">
             
-            {/* --- Modal Popup --- */}
+            {/* Modal Popup 2FA */}
             {showOtpModal && (
                 <div className="modal-overlay">
                     <div className="modal-content-otp">
@@ -120,72 +131,80 @@ const LoginPage = () => {
                 </div>
             )}
 
-            {/* --- Login Card --- */}
-            <div className={`login-card ${showOtpModal ? 'blur-bg' : ''}`}>
-                <div className="login-image-section">
-                    <div className="brand-logo">
-                        <div className="brand-circle"></div>
-                        MIDDLEWARE
-                    </div>
-                    <img 
-                        src="https://cdn.dribbble.com/users/1660738/screenshots/15467471/media/2e5e485a676b745437996c9c61453256.jpg?compress=1&resize=800x600" 
-                        alt="Login Cover" 
-                        className="login-bg-image"
-                    />
+            {/* Main Login Card */}
+            <div className={`login-main-card ${showOtpModal ? 'blur-bg' : ''}`}>
+                
+                {/* Left Side : Branding */}
+                <div className="login-left-side">
+                    <img src={Logo} alt="Idea Trade Plus" className="ba-brand-logo" />
                 </div>
 
-                <div className="login-form-section">
-                    <div className="welcome-header">
-                        <h2 className="welcome-title">Welcome Back</h2>
-                        <p className="welcome-subtitle">Please enter your details to sign in.</p>
+                {/* Right Side : Login Form */}
+                <div className="login-right-side">
+                    {/* Theme Toggle */}
+                    <button type="button" className="ba-theme-toggle" onClick={toggleTheme}>
+                        {theme === 'light' ? <FaSun size={18} /> : <FaMoon size={18} />}
+                    </button>
+
+                    <div className="ba-form-header">
+                        <h2>Sign In</h2>
+                        <p>Welcome Back! Please enter your<br/>details to sign in.</p>
                     </div>
 
                     {error && <div className="error-msg">⚠️ {error}</div>}
 
-                    <form onSubmit={handleLogin}>
-                        <div className="input-group">
-                            <label className="input-label">Username</label>
-                            <input 
-                                type="text" 
-                                className="input-field" 
-                                placeholder="Enter your username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
+                    <form onSubmit={handleLogin} className="ba-login-form">
+                        
+                        {/* Username Input */}
+                        <div className="ba-input-group">
+                            <label>Username</label>
+                            <div className="ba-input-box">
+                                <FaUser className="ba-input-icon" />
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter Username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                />
+                            </div>
                         </div>
 
-                        <div className="input-group">
-                            <label className="input-label">Password</label>
-                            <input 
-                                type="password" 
-                                className="input-field" 
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
+                        {/* Password Input */}
+                        <div className="ba-input-group">
+                            <label>Password</label>
+                            <div className="ba-input-box">
+                                <FaLock className="ba-input-icon" />
+                                <input 
+                                    type="password" 
+                                    placeholder="Enter Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    maxLength={50}
+                                />
+                            </div>
                         </div>
 
-                        <div className="form-options">
-                            <label style={{display:'flex', gap:'8px', cursor:'pointer', alignItems:'center'}}>
-                                <input type="checkbox" style={{cursor:'pointer'}} /> 
-                                <span>Remember me</span>
+                        {/* Checkbox & Forgot Password */}
+                        <div className="ba-form-options">
+                            <label className="ba-checkbox-label">
+                                <input type="checkbox" /> 
+                                <span>Remember Me</span>
                             </label>
-                            <Link to="/forgot-password" className="register-link" style={{textDecoration: 'none'}}>
+                            <Link to="/forgot-password" className="ba-forgot-link">
                                 Forgot Password?
                             </Link>
                         </div>
 
-                        <button type="submit" className="btn-login-ref" disabled={loading}>
-                            {loading ? 'Signing in...' : 'Sign In'}
+                        {/* Sign In Button*/}
+                        <button type="submit" className="ba-btn-submit" disabled={loading}>
+                            {loading ? 'Signing in...' : 'Sign in'}
                         </button>
 
-                        <div style={{textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#6b7280'}}>
+                        <div className="ba-register-prompt">
                             Don't have an account? 
-                            <Link to="/register" style={{color: '#2563eb', fontWeight: '600', textDecoration: 'none', marginLeft: '5px'}}>
-                                Create Account
-                            </Link>
+                            <Link to="/register" className="ba-signup-link"> Sign Up</Link>
                         </div>
                     </form>
                 </div>
