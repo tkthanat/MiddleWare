@@ -14,12 +14,20 @@ function LogsPage() {
       searchTerm, 
       handleSearch,
       filterType,
-      handleFilterChange
+      handleFilterChange,
+      summaryFilter,
+      handleSummaryFilter,
+      refreshLogs,
+      exportCSV
   } = useLogs();
 
   return (
     <div className="container pb-5">
-      <SummaryBar summary={summary} />
+      <SummaryBar 
+          summary={summary} 
+          activeFilter={summaryFilter}
+          onFilterChange={handleSummaryFilter}
+      />
 
       <LogsTable 
           logs={currentLogs}
@@ -31,6 +39,8 @@ function LogsPage() {
           emptyRows={emptyRows}
           filterType={filterType}
           onFilterChange={handleFilterChange}
+          onRefresh={refreshLogs}
+          onExport={exportCSV}
       />
     </div>
   );

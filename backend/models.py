@@ -44,6 +44,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     system_settings = relationship("SystemSetting", back_populates="user", uselist=False)
     security = relationship("UserSecurity", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    login_activities = relationship("LoginActivity", back_populates="user", cascade="all, delete-orphan")
 
 class UserSecurity(Base):
     __tablename__ = "user_security"
@@ -55,6 +56,16 @@ class UserSecurity(Base):
     is_2fa_enabled = Column(Boolean, default=False)
     two_fa_secret = Column(String, nullable=True)
     user = relationship("User", back_populates="security")
+
+class LoginActivity(Base):
+    __tablename__ = "login_activities"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    device_name = Column(String, default="Unknown Device")
+    location = Column(String, default="Thailand")
+    ip_address = Column(String, nullable=True)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    user = relationship("User", back_populates="login_activities")
 
 class TradeLog(Base):
     __tablename__ = "trade_logs"

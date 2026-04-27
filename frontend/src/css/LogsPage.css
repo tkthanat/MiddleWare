@@ -109,3 +109,130 @@
 .table-responsive::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
 .table-responsive::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
 .table-responsive::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+/* Clickable Summary Cards Animation */
+.summary-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.summary-clickable:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+    opacity: 1 !important;
+}
+
+.summary-clickable:active {
+    transform: translateY(0) !important;
+}
+
+/* Date Filter Dropdown */
+.filter-select-minimal {
+    width: 140px;
+    height: 36px !important;
+    min-height: 36px !important;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 4px;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+.filter-select-minimal:focus {
+    border-color: #9ca3af;
+    box-shadow: none;
+}
+
+/* Search Box */
+.search-box-minimal {
+    width: 250px;
+    height: 36px !important;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+}
+.search-box-minimal .input-group-text,
+.search-box-minimal .form-control {
+    border: none;
+    height: 34px !important;
+    font-size: 13px;
+    padding-top: 0;
+    padding-bottom: 0;
+    background-color: transparent;
+}
+.search-box-minimal .form-control:focus {
+    box-shadow: none;
+}
+.search-box-minimal:focus-within {
+    border-color: #9ca3af;
+}
+
+/* Icon Buttons (Refresh & Export) */
+.btn-minimal-icon {
+    height: 36px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+.btn-minimal-icon:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+/* Minimal Pagination */
+.minimal-pagination {
+    display: flex;
+    gap: 6px;
+}
+.minimal-pagination .page-link {
+    border: 1px solid transparent;
+    color: #4b5563;
+    border-radius: 4px !important;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    background-color: transparent;
+    transition: all 0.2s;
+    padding: 0;
+}
+.minimal-pagination .page-item.active .page-link {
+    background-color: #374151;
+    color: #ffffff;
+    border-color: #374151;
+}
+.minimal-pagination .page-link:hover:not(.disabled) {
+    background-color: #f3f4f6;
+    border-color: #e5e7eb;
+}
+.minimal-pagination .page-item.disabled .page-link {
+    color: #9ca3af;
+    background-color: transparent;
+}
+
+/* Responsive adjustment */
+@media (max-width: 991px) {
+    .search-box-minimal {
+        width: 100%;
+        flex: 1;
+    }
+    .filter-select-minimal {
+        width: auto;
+        flex: 1;
+    }
+}

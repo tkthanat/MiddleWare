@@ -14,7 +14,8 @@ import Settings from './pages/Settings';
 // --- Navigation Bar ---
 function Navigation() {
   const location = useLocation();
-  if (location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password') return null;
+  
+  if (['/login', '/register', '/forgot-password', '/settings'].includes(location.pathname)) return null;
 
   return (
     <div className="d-flex justify-content-center pt-4 pb-3">
@@ -56,7 +57,7 @@ const FloatingProfile = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [menuRef]);
 
-    const shouldHide = location.pathname === '/login' || location.pathname === '/forgot-password' || !user;
+    const shouldHide = ['/login', '/register', '/forgot-password', '/settings'].includes(location.pathname) || !user;
     if (shouldHide) return null;
 
     return (

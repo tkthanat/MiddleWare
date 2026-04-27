@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import SessionLocal
-from models import User, UserSecurity
+from models import User, UserSecurity, LoginActivity
 from passlib.context import CryptContext
 import random
 import string
@@ -202,3 +202,23 @@ async def toggle_2fa(username: str, data: TwoFaUpdate, db: Session = Depends(get
     user.security.is_2fa_enabled = data.enabled
     db.commit()
     return {"status": "success", "enabled": user.security.is_2fa_enabled}
+
+# --- ดึงประวัติการ Login ---
+@router.get("/login-activity")
+async def get_login_activity(username: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == username).first()
+    if not user: raise HTTPException(status_code=404, detail="User not found")
+    
+    activities = db.query(LoginActivity).filter(LoginActivity.user_id == user.id).order_by(LoginActivity.timestamp.desc()).limit(10).all()
+    
+    result = []
+    for idx, act in enumerate(activities):
+        date_str = act.timestamp.strftime("%d %B %Y") if act.timestamp else "Unknown"
+        result.append({
+            "id": act.id,
+            "device_name": act.device_name,
+            "location": act.location,
+            "timestamp": date_str,
+            "is_current": idx == 0
+        })
+    return result

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Depends, status, BackgroundTasks, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import get_db
@@ -57,9 +57,35 @@ class ResetPasswordRequest(BaseModel):
 def generate_otp(length=5):
     return ''.join(random.choices(string.digits, k=length))
 
+# --- Login Tracker Helper ---
+def parse_user_agent(user_agent: str):
+    if not user_agent: return "Unknown Device"
+    ua = user_agent.lower()
+    if "iphone" in ua: return "iPhone"
+    if "ipad" in ua: return "iPad"
+    if "android" in ua: return "Android Device"
+    if "macintosh" in ua or "mac os" in ua: return "Mac"
+    if "windows" in ua: return "Windows PC"
+    return "Unknown Device"
+
+def record_login(db: Session, user_id: int, req: Request):
+    user_agent = req.headers.get("user-agent", "")
+    device_name = parse_user_agent(user_agent)
+    ip_address = req.client.host if req.client else "Unknown"
+    
+    new_login = models.LoginActivity(
+        user_id=user_id,
+        device_name=device_name,
+        location="Thailand",
+        ip_address=ip_address
+    )
+    db.add(new_login)
+    db.commit()
+
 # --- Login API ---
 @router.post("/login")
 async def login(
+    req: Request,
     request: LoginRequest, 
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
@@ -82,8 +108,6 @@ async def login(
         security_setting.otp_expiry = expiry_time
         db.commit()
         
-        print(f"🔹 Generated OTP for {user.username}: {otp_code}")
-
         if user.email:
             background_tasks.add_task(send_otp_email, user.email, user.username, otp_code)
 
@@ -97,6 +121,9 @@ async def login(
             "full_name": user.full_name or "",
             "role": user.role
         }
+
+    # บันทึกประวัติการ Login เมื่อผ่านสำเร็จ
+    record_login(db, user.id, req)
 
     access_token = auth_handler.create_access_token(
         data={"sub": user.username, "role": user.role}
@@ -113,16 +140,12 @@ async def login(
 
 # --- Verify OTP API ---
 @router.post("/verify-login-otp")
-async def verify_login_otp(request: VerifyOTPRequest, db: Session = Depends(get_db)):
+async def verify_login_otp(req: Request, request: VerifyOTPRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.username == request.username).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     security_setting = db.query(models.UserSecurity).filter(models.UserSecurity.user_id == user.id).first()
-    
-    print(f"🔍 Verifying OTP for {user.username}")
-    print(f"   Input: {request.otp}")
-    print(f"   DB Code: {security_setting.otp_code if security_setting else 'None'}")
 
     if not security_setting or not security_setting.otp_code:
         raise HTTPException(status_code=400, detail="No OTP request found (Please login again)")
@@ -143,6 +166,9 @@ async def verify_login_otp(request: VerifyOTPRequest, db: Session = Depends(get_
 
     security_setting.otp_code = None 
     db.commit()
+
+    # บันทึกประวัติการ Login หลังยืนยัน OTP สำเร็จ
+    record_login(db, user.id, req)
 
     access_token = auth_handler.create_access_token(data={"sub": user.username, "role": user.role})
     
@@ -211,7 +237,6 @@ async def forgot_password(request: ForgotPasswordRequest, background_tasks: Back
     security_setting.otp_expiry = expiry_time
     db.commit()
 
-    print(f"🔹 Generated Password Reset OTP for {user.username}: {otp_code}")
     background_tasks.add_task(send_forgot_password_email, user.email, user.username, otp_code)
 
     return {"status": "success", "message": "If email exists, OTP has been sent."}
